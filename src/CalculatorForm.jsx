@@ -2,10 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import './CalculatorForm.css';
 
 function CalculatorForm() {
-  const [companyName, setCompanyName] = useState('');
-  const [breweryName, setBreweryName] = useState('');
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
 
   const [desc, setDesc] = useState({
     input1: "activeFerm",
@@ -53,19 +49,20 @@ function CalculatorForm() {
 
   const [bblTot, setBblTot] = useState(0);
   const [totVass, setTotVass] = useState(0);
-  const [fermTemp, setFermTemp] = useState('');
-  const [totHrsKnock, setTotHrsKnock] = useState('');
-  const [desireTemp, setDesireTemp] = useState('');
-  const [holdTemp, setHoldTemp] = useState('');
-  const [ambientTemp, setAmbientTemp] = useState('');
+  const [fermTemp, setFermTemp] = useState(68);
+  const [totHrsKnock, setTotHrsKnock] = useState(24);
+  const [desireTemp, setDesireTemp] = useState(33);
+  const [holdTemp, setHoldTemp] = useState(33);
+  const [ambientTemp, setAmbientTemp] = useState(90);
   const [coldLiqTank, setColdLiqTank] = useState('No');
   const [cltSize, setCltSize] = useState('');
-  const [cltTemp, setCltTemp] = useState(70);
+  const [cltWaterTemp, setCltWaterTemp] = useState(70);
   const [cltTime, setCltTime] = useState(12);
   const [cltCoolTemp, setCltCoolTemp] = useState(40);
   const [wortWaterSupply, setWortWaterSupply] = useState(70);
   const [wortCool, setWortCool] = useState('No');
   const [wortBbl, setWortBbl] = useState('');
+  const [transferTime, setTransferTime] = useState('30')
   const [knockoutTemp, setKnockoutTemp] = useState(68);
   const [walkInCool, setWalkInCool] = useState('No');
   const [walkInRoomTemp, setWalkInRoomTemp] = useState(38);
@@ -73,10 +70,27 @@ function CalculatorForm() {
   const [walkInLength, setWalkInLength] = useState('');
   const [walkInWidth, setWalkInWidth] = useState('');
   const [walkInHeight, setWalkInHeight] = useState('');
-  const [walkInBeer, setWalkInBeer] = useState('');
   const [activeFerm, setActiveFerm] = useState(0);
+  const [activeFermCount, setActiveFermCount] = useState(0);
   const [crashCooling, setCrashCooling] = useState(0);
+  const [crashCoolingCount, setCrashCoolingCount] = useState(0);
   const [holdingLoad, setHoldingLoad] = useState(0);
+  const [holdingLoadCount, setHoldingLoadCount] = useState(0);
+  const [activeBtuHour, setActiveBtuHour] = useState(0);
+  const [knockdownBtuHour, setKnockdownBtuHour] = useState(0);
+  const [cltBtuHour, setCltBtuHour] = useState(0);
+  const [sqFtFerminterPull, setSqFtFerminterPull] = useState(0);
+  const [pulldownBtuHour, setPulldownBtuHour] = useState(0);
+  const [sqFtFerminterHold, setSqFtFerminterHold] = useState(0);
+  const [holdingBtuHour, setHoldingBtuHour] = useState(0);
+  const [totalCool, setTotalCool] = useState(0);
+  
+
+  const [cellarTotal,   setCellarTotal] = useState(0);
+  const [walkInTotal,   setWalkInTotal] = useState(0);
+  const [wortTotal,   setWortTotal] = useState(0);
+
+
 
   // Calculate each row total by multiplying each Quantity of Vessels by its corresponding Size in BBL
   const calculateTotal = useCallback(() => {
@@ -84,6 +98,15 @@ function CalculatorForm() {
       const qtyValue = qtyValues[key];
       const sizeValue = sizeValues[key];
       const product = qtyValue * sizeValue;
+      walkInCalc();
+      wortCalc();
+      cellarCalc();
+      liquorLoad();
+      fermLoad();
+      knockdownLoad();
+      pulldownLoad();
+      holdingLoadFunc();
+      totalCoolCalc();
       return {
         ...acc,
         [key]: product,
@@ -104,7 +127,7 @@ function CalculatorForm() {
   }, [qtyValues, sizeValues, calculateTotal]);
 
   useEffect(() => {
-   handleDescription(); handleSelectChange
+   handleDescription(); handleSelectChange; totalCoolCalc(); cellarCalc(); walkInCalc(); wortCalc()
   }, [qtyValues, sizeValues, calculateTotal, totalBbl, desc]);
 
   const handleQtyChange = (inputName, value) => {
@@ -134,26 +157,38 @@ function CalculatorForm() {
 
   const handleDescription = () => {
     setActiveFerm(0);
+    setActiveFermCount(0);
     setCrashCooling(0);
+    setCrashCoolingCount(0);
     setHoldingLoad(0);
+    setHoldingLoadCount(0);
     let activeTotal = 0;
+    let activeCount = 0
     let crashTotal = 0;
+    let crashCount = 0;
     let holdingTotal = 0;
+    let holdingCount = 0;
     for(let i=1;i<=8;i++){
       const inputName = `input${i}`;
       if(desc[inputName] === "activeFerm"){
-        activeTotal += totalBbl[inputName]
+        activeTotal += totalBbl[inputName];
+        activeCount += qtyValues[inputName];
       }
       else if(desc[inputName] === "crashCooling"){
-        crashTotal += totalBbl[inputName]
+        crashTotal += totalBbl[inputName];
+        crashCount += qtyValues[inputName];
       }
       else if(desc[inputName] === "holdingLoad"){
-        holdingTotal += totalBbl[inputName]
+        holdingTotal += totalBbl[inputName];
+        holdingCount += qtyValues[inputName];
       }
     }
     setActiveFerm(activeTotal);
+    setActiveFermCount(activeCount);
     setCrashCooling(crashTotal);
+    setCrashCoolingCount(crashCount);
     setHoldingLoad(holdingTotal);
+    setHoldingLoadCount(holdingCount);
   }
 
   const handleSelectChange = (index, selectedValue) => {
@@ -164,680 +199,669 @@ function CalculatorForm() {
   };
 
 
+//Fermintation Load
+const fermLoad = () => {
+  let fermentationTime = 72;
+  setActiveBtuHour(((activeFerm*15) * (280)) / fermentationTime );
+}
 
+//Knockdown Load
+const knockdownLoad = () => {
+  let knockdownMultiply = (crashCooling*31)*(9)*(0.9);
+  let fermTempDif = fermTemp - desireTemp
+  let knockTot = knockdownMultiply * fermTempDif
+  setKnockdownBtuHour(knockTot / totHrsKnock);
+  console.log()
+}
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Old Page Sent Email with this, use to submit survery form if we want to go that route?
+//Cold Liquor Tank
+const liquorLoad = () => {
+  let load = (cltSize * 31) * (9) * (.9)
+  //Temp Difference
+  let tempDif =  cltWaterTemp - cltCoolTemp;
+  //Load * Temp Dif / Pulldown Time
+   setCltBtuHour(Math.round((load * tempDif)/(cltTime)*1.15*1.3)); 
+}
+
+//Pulldown Load
+const pulldownLoad = () => {
+  let avgVass = bblTot/totVass;
+    const avgValues = {
+      1: 5,
+      5: 15,
+      7: 30,
+      10: 50,
+      15: 75,
+      20: 100,
+      30: 150,
+      40: 200,
+      50: 250,
+      60: 300,
+      80: 375,
+      90: 425,
+      100: 500,
+      120: 600,
+      240: 1100
   };
+  
+  // Find the appropriate key based on avgVass
+  let key = Object.keys(avgValues)
+  .sort((a, b) => b - a) // Sort keys in descending order
+  .find(k => k <= avgVass);
+
+// If no key is found, use the smallest key
+if (!key) {
+  key = Math.min(...Object.keys(avgValues));
+}
+
+  setSqFtFerminterPull(avgValues[key]);
+  let sqFtPull = ((sqFtFerminterPull * crashCoolingCount) * (0.15));
+  let totBtu = ((ambientTemp - holdTemp) /2 );
+  setPulldownBtuHour(totBtu * sqFtPull);
+}
+
+//Holding Load
+const holdingLoadFunc = () => {
+  let avgVass = Math.round(bblTot/totVass);
+    const avgValues = {
+      1: 5,
+      5: 15,
+      7: 30,
+      10: 50,
+      15: 75,
+      20: 100,
+      30: 150,
+      40: 200,
+      50: 250,
+      60: 300,
+      80: 375,
+      90: 425,
+      100: 500,
+      120: 600,
+      240: 1100
+  };
+  
+  // Find the appropriate key based on avgVass
+  let key = Object.keys(avgValues)
+  .sort((a, b) => b - a) // Sort keys in descending order
+  .find(k => k <= avgVass);
+
+// If no key is found, use the smallest key
+if (!key) {
+  key = Math.min(...Object.keys(avgValues));
+}
+
+  setSqFtFerminterHold(avgValues[key]);
+  let sqFtHold = ((sqFtFerminterHold * holdingLoadCount) * (0.15));
+  let tempDifHold = ambientTemp - holdTemp;
+  setHoldingBtuHour(sqFtHold * tempDifHold);
+}
+
+
+//WalkIn Cooler
+const walkInCalc = () => { 
+  setWalkInTotal(Math.round(((walkInLength*walkInWidth)+(walkInWidth*walkInHeight)+(walkInLength*walkInHeight))*2*14*(1.15*1.3)));
+};
+
+
+//Wort Cooling
+const wortCalc = () => {
+  let wortTempDif =  (wortWaterSupply + 10) - knockoutTemp;
+  let wortNumber = ((wortBbl * 31) / transferTime) * (wortTempDif * 500);
+  setWortTotal(Math.round(wortNumber * 1.15*1.3));
+}
+
+//Cellar Cooling Req
+const cellarCalc = () => {
+  setCellarTotal(Math.round((activeBtuHour + knockdownBtuHour + pulldownBtuHour + holdingBtuHour) * 1.15 * 1.3));
+  console.log(activeBtuHour, knockdownBtuHour, pulldownBtuHour, holdingBtuHour);
+}
+
+
+const totalCoolCalc = () => {
+  setTotalCool(cellarTotal+ cltBtuHour + walkInTotal + wortTotal);
+}
+
+
 
   return (
     <div>
-      <section>
         <div className="form-style-1">
-          <form id="survey" onSubmit={handleSubmit}>
-            <fieldset className="form-style-2">
-              <img
-                id="logo"
-                src="https://prochiller.com/wp-content/uploads/2018/05/Pro-Chiller-Logo-Dark-Blue.png"
-              />
-              <input
-                type="text"
-                name="company"
-                value={companyName}
-                placeholder="Company Name"
-                onChange={(e) => setCompanyName(e.target.value)}
-              />
-              <input
-                type="text"
-                name="brewery"
-                value={breweryName}
-                placeholder="Brewery Name"
-                onChange={(e) => setBreweryName(e.target.value)}
-              />
-              <input
-                type="text"
-                name="name"
-                value={name}
-                required
-                placeholder="Name *"
-                onChange={(e) => setName(e.target.value)}
-              />
-              <input
-                type="email"
-                name="email"
-                value={email}
-                required
-                placeholder="Email"
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </fieldset>         
-            <fieldset>
-              <legend>Brewload Calculator</legend>
-
-              <div>
-                <table id="surveytab">
-                  <th>Description</th>
-                  <th>Quantity</th>
-                  <th>Tanks Size</th>
-                  <th>Total BBL</th>
-                  <tbody className="surveytr">
-                    <td>
-                      <select key={1} id="hear" name="hear" onChange={(e) => handleSelectChange(1, e.target.value)}>
-                        <option  value="activeFerm" >Active Fermentation</option>
-                        <option  value="crashCooling">Crash Cooling</option>
-                        <option  value="holdingLoad">Holding Load</option>
-                      </select>
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        className="qt1"
-                        id="quanVes1"
-                        name="quanVes1"
-                        value={qtyValues.input1}
-                        placeholder="6 EA"
-                        onChange={(e) =>
-                          handleQtyChange('input1', e.target.value)
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        className="sz1"
-                        id="szBbl1"
-                        name="szBbl1"
-                        value={sizeValues.input1}
-                        placeholder="15 BBL"
-                        onChange={(e) =>
-                          handleSizeChange('input1', e.target.value)
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        className="totBbl"
-                        id="totBbl1"
-                        name="totBbl1"
-                        value={totalBbl.input1}
-                        readOnly
-                      />
-                    </td>
-                  </tbody>
-                  <tbody className="surveytr">
-                    <td>
-                      <select key={2}id="hear" name="hear" onChange={(e) => handleSelectChange(2, e.target.value)}>
-                        <option value="activeFerm" >Active Fermentation</option>
-                        <option value="crashCooling">Crash Cooling</option>
-                        <option value="holdingLoad">Holding Load</option>
-                      </select>
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        className="qt1"
-                        id="quanVes2"
-                        name="quanVes2"
-                        value={qtyValues.input2}
-                        placeholder="6 EA"
-                        onChange={(e) =>
-                          handleQtyChange('input2', e.target.value)
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        className="sz1"
-                        id="szBbl2"
-                        name="szBbl2"
-                        value={sizeValues.input2}
-                        placeholder="15 BBL"
-                        onChange={(e) =>
-                          handleSizeChange('input2', e.target.value)
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        className="totBbl"
-                        id="totBbl2"
-                        name="totBbl2"
-                        value={totalBbl.input2}
-                        readOnly
-                      />
-                    </td>
-                  </tbody>
-                  <tbody className="surveytr">
-                    <td>
-                      <select key={3} id="hear" name="hear" onChange={(e) => handleSelectChange(3, e.target.value)}>
-                        <option value="activeFerm" >Active Fermentation</option>
-                        <option value="crashCooling">Crash Cooling</option>
-                        <option value="holdingLoad">Holding Load</option>
-                      </select>
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        className="qt1"
-                        id="quanVes3"
-                        name="quanVes3"
-                        value={qtyValues.input3}
-                        placeholder="6 EA"
-                        onChange={(e) =>
-                          handleQtyChange('input3', e.target.value)
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        className="sz1"
-                        id="szBbl3"
-                        name="szBbl3"
-                        value={sizeValues.input3}
-                        placeholder="15 BBL"
-                        onChange={(e) =>
-                          handleSizeChange('input3', e.target.value)
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        className="totBbl"
-                        id="totBbl3"
-                        name="totBbl3"
-                        value={totalBbl.input3}
-                        readOnly
-                      />
-                    </td>
-                  </tbody>
-                  <tbody className="surveytr">
-                    <td>
-                      <select key={4} id="hear" name="hear" onChange={(e) => handleSelectChange(4, e.target.value)}>
-                        <option value="activeFerm">Active Fermentation</option>
-                        <option value="crashCooling">Crash Cooling</option>
-                        <option value="holdingLoad">Holding Load</option>
-                      </select>
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        className="qt1"
-                        id="quanVes4"
-                        name="quanVes4"
-                        value={qtyValues.input4}
-                        placeholder="6 EA"
-                        onChange={(e) =>
-                          handleQtyChange('input4', e.target.value)
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        className="sz1"
-                        id="szBbl4"
-                        name="szBbl4"
-                        value={sizeValues.input4}
-                        placeholder="15 BBL"
-                        onChange={(e) =>
-                          handleSizeChange('input4', e.target.value)
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        className="totBbl"
-                        id="totBbl4"
-                        name="totBbl4"
-                        value={totalBbl.input4}
-                        readOnly
-                      />
-                    </td>
-                  </tbody>
-                  <tbody className="surveytr">
-                    <td>
-                      <select key={5} id="hear" name="hear" onChange={(e) => handleSelectChange(5, e.target.value)}>
-                        <option value="activeFerm" >Active Fermentation</option>
-                        <option value="crashCooling">Crash Cooling</option>
-                        <option value="holdingLoad">Holding Load</option>
-                      </select>
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        className="qt1"
-                        id="quanVes5"
-                        name="quanVes5"
-                        value={qtyValues.input5}
-                        placeholder="6 EA"
-                        onChange={(e) =>
-                          handleQtyChange('input5', e.target.value)
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        className="sz1"
-                        id="szBbl5"
-                        name="szBbl5"
-                        value={sizeValues.input5}
-                        placeholder="15 BBL"
-                        onChange={(e) =>
-                          handleSizeChange('input5', e.target.value)
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        className="totBbl"
-                        id="totBbl5"
-                        name="totBbl5"
-                        value={totalBbl.input5}
-                        readOnly
-                      />
-                    </td>
-                  </tbody>
-                  <tr className="surveytr">
-                    <td>
-                      <select key={6} id="hear" name="hear" onChange={(e) => handleSelectChange(6, e.target.value)}>
-                        <option value="activeFerm" >Active Fermentation</option>
-                        <option value="crashCooling">Crash Cooling</option>
-                        <option value="holdingLoad">Holding Load</option>
-                      </select>
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        className="qt1"
-                        id="quanVes6"
-                        name="quanVes6"
-                        value={qtyValues.input6}
-                        placeholder="6 EA"
-                        onChange={(e) =>
-                          handleQtyChange('input6', e.target.value)
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-
-                        id="szBbl6"
-                        name="szBbl6"
-                        value={sizeValues.input6}
-                        placeholder="15 BBL"
-                        onChange={(e) =>
-                          handleSizeChange('input6', e.target.value)
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        className="totBbl"
-                        id="totBbl6"
-                        name="totBbl6"
-                        value={totalBbl.input6}
-                        readOnly
-                      />
-                    </td>
-                  </tr>
-                  <tr className="surveytr">
-                    <td>
-                      <select key={7} id="hear" name="hear" onChange={(e) => handleSelectChange(7, e.target.value)}>
-                        <option value="activeFerm">Active Fermentation</option>
-                        <option value="crashCooling">Crash Cooling</option>
-                        <option value="holdingLoad">Holding Load</option>
-                      </select>
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        className="qt1"
-                        id="quanVes7"
-                        name="quanVes7"
-                        value={qtyValues.input7}
-                        placeholder="6 EA"
-                        onChange={(e) =>
-                          handleQtyChange('input7', e.target.value)
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        className="sz1"
-                        id="szBbl7"
-                        name="szBbl7"
-                        value={sizeValues.input7}
-                        placeholder="15 BBL"
-                        onChange={(e) =>
-                          handleSizeChange('input7', e.target.value)
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        className="totBbl"
-                        id="totBbl7"
-                        name="totBbl7"
-                        value={totalBbl.input7}
-                        readOnly
-                      />
-                    </td>
-                  </tr>
-                  <tr className="surveytr">
-                    <td>
-                      <select key={8} id="hear" name="hear" onChange={(e) => handleSelectChange(8, e.target.value)}>
-                        <option value="activeFerm">Active Fermentation</option>
-                        <option value="crashCooling">Crash Cooling</option>
-                        <option value="holdingLoad">Holding Load</option>
-                      </select>
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        className="qt1"
-                        id="quanVes8"
-                        name="quanVes8"
-                        value={qtyValues.input8}
-                        placeholder="6 EA"
-                        onChange={(e) =>
-                          handleQtyChange('input8', e.target.value)
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        className="sz1"
-                        id="szBbl8"
-                        name="szBbl8"
-                        value={sizeValues.input8}
-                        placeholder="15 BBL"
-                        onChange={(e) =>
-                          handleSizeChange('input8', e.target.value)
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        className="totBbl"
-                        id="totBbl8"
-                        name="totBbl8"
-                        value={totalBbl.input8}
-                        readOnly
-                      />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <b>Total Vassels</b>
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        id="totvass"
-                        name="totvass"
-                        value={totVass}
-                        readOnly
-                      />
-                    </td>
-                    <td>
-                      <b>Total BBLs</b>
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        id="finbbltot"
-                        name="finbbltot"
-                        value={bblTot}
-                        readOnly
-                      />
-                    </td>
-                  </tr>
-                </table>
+          <form id="survey" className="">
+              
+            <div className="flex flex-row text-xs ">    
+              <div className="flex-row basis-1/3 p-2 ">
+                <div className="text-lg">
+                  <b className="">Active Fermentation</b>
+                </div>
+                <div className="flex flex-row mt-4 justify-center">
+                  <div className="mt-1">
+                    <b className="">Fermintation Temp (°F):</b>
+                  </div>
+                  <input
+                    type="text"
+                    className="fermTemp w-10 h-6"
+                    id="fermTemp"
+                    value={fermTemp}
+                    onChange={(e) => setFermTemp(e.target.value)}
+                  />
+                </div>
               </div>
-            </fieldset>
+
+              <div className="basis-1/3 p-2">
+                <div className="text-lg">
+                  <b>Crash Cooling</b>
+                </div>
+                  <div className="flex flex-row justify-center">
+                    <div className="mt-1">
+                      <b>Cooling Duration (hrs):</b>
+                    </div>
+                    <input
+                      type="text"
+                      className="totHrsKnock w-10 h-6"
+                      id="totHrsKnock"
+                      value={totHrsKnock}
+                      onChange={(e) => setTotHrsKnock(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex flex-row justify-center">
+                    <div className="my-1 pe-3">
+                      <b>Temp To Cool To (°F):</b>
+                    </div>
+                    <input
+                      type="text"
+                      className="desireTemp w-10 h-6"
+                      id="desireTemp"
+                      value={desireTemp}
+                      onChange={(e) => setDesireTemp(e.target.value)}
+                    />
+                  </div>
+              </div>
+
+              <div className="basis-1/3 p-2">
+                <div className="text-lg">
+                  <b>Holding Load</b>
+                </div>
+                <div className="flex flex-row justify-center">
+                  <div className="my-1 pe-1">
+                    <b>Holding Temp (°F)</b>
+                  </div>
+                  <input
+                    type="text"
+                    className="holdTemp w-10 h-6"
+                    id="holdTemp"
+                    value={holdTemp}
+                    onChange={(e) => setHoldTemp(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex flex-row justify-center">
+                  <div className="my-1">
+                    <b>Ambient Temp (°F)</b>
+                  </div>
+                  <input
+                    type="text"
+                    className="ambientTemp w-10 h-6 "
+                    id="ambientTemp"
+                    value={ambientTemp}
+                    placeholder="90"
+                    onChange={(e) => setAmbientTemp(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>  
+
+
+            <div className="flex justify-center">     
+              <fieldset className="basis-5/7">
+                <div className="">
+                  <table id="surveytab" >
+                    <th>Description</th>
+                    <th>Quantity</th>
+                    <th>Tanks Size</th>
+                    <tbody className="surveytr text-xs">
+                      <td>
+                        <select key={1} id="hear" onChange={(e) => handleSelectChange(1, e.target.value)}>
+                          <option  value="activeFerm" >Active Fermentation</option>
+                          <option  value="crashCooling">Crash Cooling</option>
+                          <option  value="holdingLoad">Holding Load</option>
+                        </select>
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          className="qt1"
+                          id="quanVes1"
+                          value={qtyValues.input1}
+                          placeholder="6 EA"
+                          onChange={(e) =>
+                            handleQtyChange('input1', e.target.value)
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          className="sz1"
+                          id="szBbl1"
+                          value={sizeValues.input1}
+                          placeholder="15 BBL"
+                          onChange={(e) =>
+                            handleSizeChange('input1', e.target.value)
+                          }
+                        />
+                      </td>
+                    </tbody>
+                    <tbody className="surveytr text-xs">
+                      <td>
+                        <select key={2}id="hear" className="hear" onChange={(e) => handleSelectChange(2, e.target.value)}>
+                          <option value="activeFerm" >Active Fermentation</option>
+                          <option value="crashCooling">Crash Cooling</option>
+                          <option value="holdingLoad">Holding Load</option>
+                        </select>
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          className="qt1"
+                          id="quanVes2"
+                          value={qtyValues.input2}
+                          placeholder="6 EA"
+                          onChange={(e) =>
+                            handleQtyChange('input2', e.target.value)
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          className="sz1"
+                          id="szBbl2"
+                          value={sizeValues.input2}
+                          placeholder="15 BBL"
+                          onChange={(e) =>
+                            handleSizeChange('input2', e.target.value)
+                          }
+                        />
+                      </td>
+                    </tbody>
+                    <tbody className="surveytr text-xs">
+                      <td>
+                        <select key={3} id="hear" onChange={(e) => handleSelectChange(3, e.target.value)}>
+                          <option value="activeFerm" >Active Fermentation</option>
+                          <option value="crashCooling">Crash Cooling</option>
+                          <option value="holdingLoad">Holding Load</option>
+                        </select>
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          className="qt1"
+                          id="quanVes3"
+                          value={qtyValues.input3}
+                          placeholder="6 EA"
+                          onChange={(e) =>
+                            handleQtyChange('input3', e.target.value)
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          className="sz1"
+                          id="szBbl3"
+                          value={sizeValues.input3}
+                          placeholder="15 BBL"
+                          onChange={(e) =>
+                            handleSizeChange('input3', e.target.value)
+                          }
+                        />
+                      </td>
+                    </tbody>
+                    <tbody className="surveytr text-xs">
+                      <td>
+                        <select key={4} id="hear" onChange={(e) => handleSelectChange(4, e.target.value)}>
+                          <option value="activeFerm">Active Fermentation</option>
+                          <option value="crashCooling">Crash Cooling</option>
+                          <option value="holdingLoad">Holding Load</option>
+                        </select>
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          className="qt1"
+                          id="quanVes4"
+                          value={qtyValues.input4}
+                          placeholder="6 EA"
+                          onChange={(e) =>
+                            handleQtyChange('input4', e.target.value)
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          className="sz1"
+                          id="szBbl4"
+                          value={sizeValues.input4}
+                          placeholder="15 BBL"
+                          onChange={(e) =>
+                            handleSizeChange('input4', e.target.value)
+                          }
+                        />
+                      </td>
+                    </tbody>
+                    <tbody className="surveytr text-xs">
+                      <td>
+                        <select key={5} id="hear" onChange={(e) => handleSelectChange(5, e.target.value)}>
+                          <option value="activeFerm" >Active Fermentation</option>
+                          <option value="crashCooling">Crash Cooling</option>
+                          <option value="holdingLoad">Holding Load</option>
+                        </select>
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          className="qt1"
+                          id="quanVes5"
+                          value={qtyValues.input5}
+                          placeholder="6 EA"
+                          onChange={(e) =>
+                            handleQtyChange('input5', e.target.value)
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          className="sz1"
+                          id="szBbl5"
+                          value={sizeValues.input5}
+                          placeholder="15 BBL"
+                          onChange={(e) =>
+                            handleSizeChange('input5', e.target.value)
+                          }
+                        />
+                      </td>
+                    </tbody>
+                    <tr className="surveytr text-xs">
+                      <td>
+                        <select key={6} id="hear" onChange={(e) => handleSelectChange(6, e.target.value)}>
+                          <option value="activeFerm" >Active Fermentation</option>
+                          <option value="crashCooling">Crash Cooling</option>
+                          <option value="holdingLoad">Holding Load</option>
+                        </select>
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          className="qt1"
+                          id="quanVes6"
+                          value={qtyValues.input6}
+                          placeholder="6 EA"
+                          onChange={(e) =>
+                            handleQtyChange('input6', e.target.value)
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          id="szBbl6"
+                          value={sizeValues.input6}
+                          placeholder="15 BBL"
+                          onChange={(e) =>
+                            handleSizeChange('input6', e.target.value)
+                          }
+                        />
+                      </td>
+                    </tr>
+                    <tr className="surveytr text-xs">
+                      <td>
+                        <select key={7} id="hear" onChange={(e) => handleSelectChange(7, e.target.value)}>
+                          <option value="activeFerm">Active Fermentation</option>
+                          <option value="crashCooling">Crash Cooling</option>
+                          <option value="holdingLoad">Holding Load</option>
+                        </select>
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          className="qt1"
+                          id="quanVes7"
+                          value={qtyValues.input7}
+                          placeholder="6 EA"
+                          onChange={(e) =>
+                            handleQtyChange('input7', e.target.value)
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          className="sz1"
+                          id="szBbl7"
+                          value={sizeValues.input7}
+                          placeholder="15 BBL"
+                          onChange={(e) =>
+                            handleSizeChange('input7', e.target.value)
+                          }
+                        />
+                      </td>
+                    </tr>
+                    <tr className="surveytr text-xs">
+                      <td>
+                        <select key={8} id="hear" onChange={(e) => handleSelectChange(8, e.target.value)}>
+                          <option value="activeFerm">Active Fermentation</option>
+                          <option value="crashCooling">Crash Cooling</option>
+                          <option value="holdingLoad">Holding Load</option>
+                        </select>
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          className="qt1"
+                          id="quanVes8"
+                          value={qtyValues.input8}
+                          placeholder="6 EA"
+                          onChange={(e) =>
+                            handleQtyChange('input8', e.target.value)
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          className="sz1"
+                          id="szBbl8"
+                          value={sizeValues.input8}
+                          placeholder="15 BBL"
+                          onChange={(e) =>
+                            handleSizeChange('input8', e.target.value)
+                          }
+                        />
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </fieldset>
+              <div className="basis-2/7 text-xs p-2"> 
+                <div></div>
+                <div className="">
+                  <div className="">
+                    <b>Cellar Cooling Requirement</b>
+                  </div>
+                  <input
+                    type="text"
+                    className=""
+                    value={cellarTotal}
+                    readOnly
+                  />
+                </div>
+                <div className="">
+                  <div className="">
+                    <b>Cold Liquor Cooling Required</b>
+                  </div>
+                  <input
+                    type="text"
+                    className=""
+                    value={cltBtuHour}
+                    readOnly
+                    
+                  />
+                </div>
+                <div className="">
+                  <div className="">
+                    <b>Walk-In Cooler Requirement</b>
+                  </div>
+                  <input
+                    type="text"
+                    className=""
+                    value={walkInTotal}
+                    readOnly
+                  />
+                </div>
+                <div className="">
+                  <div className="">
+                    <b>2 Stage Wort Cooler Requirement</b>
+                  </div>
+                  <input
+                    type="text"
+                    className=""
+                    value={wortTotal}
+                    readOnly
+                  />
+                </div>
+                <div className="">
+                  <div className="">
+                    <b>Total Cooling Requirement</b>
+                  </div>
+                  <input
+                    type="text"
+                    className=""
+                    value={totalCool}
+                    readOnly
+                  />
+                </div>
+                <div className="">
+                  <div className="">
+                    <b>Recommended Chiller</b>
+                  </div>
+                  <input
+                    type="text"
+                    className=""
+                    value={knockoutTemp}
+                    readOnly
+                  />
+                </div>
+                <div></div>
+              </div>    
+            </div>            
+
+
             <br />
-            <fieldset>
-              <legend>Load Estimate</legend>
-              <div>
-                <table>
-                  <tr>
-                    <th colSpan="2">
-                      <b>Active Fermentation</b>
-                    </th>
-                  </tr>
-                  <tr>
-                    <td>
-                      <b>Total BBL Active:</b>
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        name="activeFerm"
-                        className="step2"
-                        id="activeFerm"
-                        value={activeFerm}
-                        readOnly
-                      />
-                    </td>
-                  </tr>
-                  <tr className="esttr">
-                    <td>
-                      <b>Fermintation Temp (°F):</b>
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        name="fermtemp"
-                        className="fermTemp"
-                        id="fermTemp"
-                        value={fermTemp}
-                        onChange={(e) => setFermTemp(e.target.value)}
-                      />
-                    </td>
-                  </tr>
-                  <tr className="esttr">
-                    <th colSpan="2">
-                      <b>Crash Cooling</b>
-                    </th>
-                  </tr>
-                  <tr className="esttr">
-                    <td>
-                      <b>Total BBL Crashing:</b>
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        name="crashCooling"
-                        className="step2"
-                        id="crashCooling"
-                        value={crashCooling}
-                        readOnly
-                      />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <b>
-                        Cooling Duration (hrs):
-                      </b>
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        name="totHrsKnock"
-                        id="totHrsKnock"
-                        placeholder="24"
-                        value={totHrsKnock}
-                        onChange={(e) => setTotHrsKnock(e.target.value)}
-                      />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <b>
-                        Temp To Cool To (°F):
-                      </b>
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        name="desireTemp"
-                        id="desireTemp"
-                        value={desireTemp}
-                        placeholder="30"
-                        onChange={(e) => setDesireTemp(e.target.value)}
-                      />
-                    </td>
-                  </tr>
-                  <tr>
-                    <th colSpan="2">
-                      <b>Holding Load</b>
-                    </th>
-                  </tr>
-                  <tr className="esttr">
-                    <td>
-                      <b>
-                        Total BBL Holding:
-                      </b>
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        name="holdingLoad"
-                        className="step2"
-                        id="holdingLoad"
-                        value={holdingLoad}
-                        readOnly
-                      />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <b>
-                        Hold Temp  (°F)
-                      </b>
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        name="holdTemp"
-                        id="holdTemp"
-                        value={holdTemp}
-                        placeholder="33"
-                        onChange={(e) => setHoldTemp(e.target.value)}
-                      />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <b>
-                        Ambient Temp (°F)
-                      </b>
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        name="ambientTemp"
-                        id="ambientTemp"
-                        value={ambientTemp}
-                        placeholder="90"
-                        onChange={(e) => setAmbientTemp(e.target.value)}
-                      />
-                    </td>
-                  </tr>
-                </table>
+            <div className="flex flex-row text-xs">
+              <div className="basis-1/4 p-2 flex">
+                <div className=" pt-2">  
+                  <b>Total BBL Active:</b>
+                </div>           
+                <input
+                    type="text"
+                    className=" w-10 h-6"
+                    id="activeFerm"
+                    value={activeFerm}
+                    readOnly
+                />
+              </div>  
+              <div className="basis-1/4 p-2 flex">
+                <div className="pt-2">
+                  <b>Total BBL Crashing:</b>
+                </div>
+                <input
+                  type="text"
+                  className="w-10 h-6"
+                  id="crashCooling"
+                  value={crashCooling}
+                  readOnly
+                />
               </div>
-            </fieldset>
-            <fieldset>
-              <legend>Questions</legend>
+              <div className="basis-1/4 p-2 flex">  
+                <div className="pt-2">
+                  <b>Total BBL Holding:</b>
+                </div>
+                <input
+                  type="text"
+                  className="w-10 h-6"
+                  id="holdingLoad"
+                  value={holdingLoad}
+                  readOnly
+                />
+              </div>    
+            </div>    
+
+
+
+          <div className="flex text-xs">
+
               <div>
-                <table className="form-style-1">
-                  <tr>
-                    <td>
                       <b>Are you using a Cold Liquor Tank?</b>
                       <select
                         id="coldliqtank"
-                        name="coldliqtank"
                         onChange={(e) => setColdLiqTank(e.target.value)}
                       >
                         <option value="No">No</option>
                         <option value="Yes">Yes</option>
                       </select>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
+
+                  <div>
                       {coldLiqTank === 'Yes' && (
                         <div id="coldliqtankq">
-                          <table className="form-style-3">
-                          <tr>
-                              <td>
+                          <table className="">
+                              <div>
                                 <b>Temp to Cool To (°F)</b>
-                              </td>
-                              <td>
+                              </div>
                                 <input
                                   type="text"
-                                  name="cltCoolTemp"
                                   value={cltCoolTemp}
                                   onChange={(e) => setCltCoolTemp(e.target.value)}
                                 />
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>
+
+
+                            <div>
+                              <div>
                                 <b>BBL of Cold Liquor</b>
-                              </td>
-                              <td>
+                              </div>
                                 <input
                                   type="text"
-                                  name="cltSize"
                                   placeholder="Enter BBL"
                                   value={cltSize}
                                   onChange={(e) => setCltSize(e.target.value)}
                                 />
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>
+                            </div>
+
+                            <div>
+                              <div>
                                 <b>Water Supply Temp (°F)</b>
-                              </td>
-                              <td>
+                              </div>
                                 <input
                                   type="text"
-                                  name="cltTemp"
-                                  value={cltTemp}
-                                  onChange={(e) => setCltTemp(e.target.value)}
+                                  value={cltWaterTemp}
+                                  onChange={(e) => setCltWaterTemp(e.target.value)}
                                 />
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>
+                            </div>
+
+                            <div>
+                              <div>
                                 <b>Time to Cool (hrs)</b>
-                              </td>
-                              <td>
+                              </div>
                                 <input
                                   type="text"
-                                  name="coolTime"
                                   value={cltTime}
                                   onChange={(e) => setCltTime(e.target.value)}
                                 />
-                              </td>
-                            </tr>
+                            </div>
+
+
                             <tr>
                               <td>
                                 <br />
@@ -849,14 +873,12 @@ function CalculatorForm() {
                           </table>
                         </div>
                       )}
-                    </td>
-                  </tr>
+                  </div>
                   <tr>
                     <td>
                       <b>Do you use glycol for your Wort Cooling?</b>
                       <select
                         id="wortcool"
-                        name="wortcool"
                         onChange={(e) => setWortCool(e.target.value)}
                       >
                         <option value="No" >
@@ -879,7 +901,6 @@ function CalculatorForm() {
                                     <td>
                                       <input
                                         type="text"
-                                        name="batches"
                                         value={wortWaterSupply}
                                         onChange={(e) => setWortWaterSupply(e.target.value)}
                                       />
@@ -892,7 +913,6 @@ function CalculatorForm() {
                                     <td>
                                       <input
                                         type="text"
-                                        name="wortBbl"
                                         placeholder="BBL"
                                         value={wortBbl}
                                         onChange={(e) => setWortBbl(e.target.value)}
@@ -904,7 +924,8 @@ function CalculatorForm() {
                                     <b>Transfer Time of Wort</b>
                                   </td>
                                     <td>
-                                      <select name="wortFlowTime">
+                                      <select
+                                        onChange={(e) => setTransferTime(e.target.value)}>
                                         <option value={30}>30 Min</option>
                                         <option value={45}>45 Min</option>
                                         <option value={60}>60 Min</option>
@@ -918,7 +939,6 @@ function CalculatorForm() {
                                   <td>
                                     <input
                                       type="text"
-                                      name="knockoutTemp"
                                       value={knockoutTemp}
                                       onChange={(e) => setKnockoutTemp(e.target.value)}
                                     />
@@ -934,7 +954,6 @@ function CalculatorForm() {
                       <b>Do you have a Walk-In Cooler?</b>
                       <select
                         id="walkincool"
-                        name="walkincool"
                         onChange={(e) => setWalkInCool(e.target.value)}
                       >
                         <option value="No" >No</option>
@@ -954,8 +973,8 @@ function CalculatorForm() {
                                   <td>
                                     <input
                                       type="text"
-                                      name="walkInRoomTemp"
                                       value={walkInRoomTemp}
+                                      onChange={(e) => setWalkInRoomTemp(e.target.value)}
                                     />
                                   </td>
                                 </tr>
@@ -966,8 +985,8 @@ function CalculatorForm() {
                                   <td>
                                     <input
                                       type="text"
-                                      name="walkInGlycolTemp"
                                       value={walkInGlycolTemp}
+                                      onChange={(e) => setWalkInGlycolTemp(e.target.value)}
                                     />
                                   </td>
                                 </tr>
@@ -978,8 +997,9 @@ function CalculatorForm() {
                                   <td>
                                     <input
                                       type="text"
-                                      name="walkinCoolerL"
                                       placeholder="Length"
+                                      value={walkInLength}
+                                      onChange={(e) => setWalkInLength(e.target.value)}
                                     />
                                   </td>
                                 </tr>
@@ -988,8 +1008,9 @@ function CalculatorForm() {
                                   <td>
                                     <input
                                       type="text"
-                                      name="walkinCoolerW"
                                       placeholder="Width"
+                                      value={walkInWidth}
+                                      onChange={(e) => setWalkInWidth(e.target.value)}
                                     />
                                   </td>
                                 </tr>
@@ -998,8 +1019,9 @@ function CalculatorForm() {
                                   <td>
                                     <input
                                       type="text"
-                                      name="walkinCoolerH"
                                       placeholder="Height"
+                                      value={walkInHeight}
+                                      onChange={(e) => setWalkInHeight(e.target.value)}
                                     />
                                   </td>
                                 </tr>
@@ -1009,64 +1031,16 @@ function CalculatorForm() {
                         </div>
                       )}
                   </tr>
-                </table>
               </div>
-            </fieldset>
+            <div className="ml-20">
+              <img
+                  id="logo"
+                  src="https://prochiller.com/wp-content/uploads/2018/05/Pro-Chiller-Logo-Dark-Blue.png"
+                />
+            </div>
+            </div>
           </form>
-
-
-          <form>
-            <fieldset>
-              <b>Cellar Cooling Requirement</b>
-            <input
-              type="text"
-              name="knockoutTemp"
-              value={knockoutTemp}
-              onChange={(e) => setKnockoutTemp(e.target.value)}
-            />
-            <b>Cold Liquor Cooling Required</b>
-            <input
-              type="text"
-              name="knockoutTemp"
-              value={knockoutTemp}
-              onChange={(e) => setKnockoutTemp(e.target.value)}
-            />
-            <b>Walk-In Cooler Requirement</b>
-            <input
-              type="text"
-              name="knockoutTemp"
-              value={knockoutTemp}
-              onChange={(e) => setKnockoutTemp(e.target.value)}
-            />
-            <b>2 Stage Wort Cooler Requirement</b>
-            <input
-              type="text"
-              name="knockoutTemp"
-              value={knockoutTemp}
-              onChange={(e) => setKnockoutTemp(e.target.value)}
-            />
-            <b>Total Cooling Requirement</b>
-            <input
-              type="text"
-              name="knockoutTemp"
-              value={knockoutTemp}
-              onChange={(e) => setKnockoutTemp(e.target.value)}
-            />
-            <b>Recommended Chiller</b>
-            <input
-              type="text"
-              name="knockoutTemp"
-              value={knockoutTemp}
-              onChange={(e) => setKnockoutTemp(e.target.value)}
-            />
-
-            </fieldset>                
-          </form>
-
-
-
         </div>
-      </section>
     </div>
   );
 }
