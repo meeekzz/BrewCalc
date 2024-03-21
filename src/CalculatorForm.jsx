@@ -84,7 +84,8 @@ function CalculatorForm() {
   const [sqFtFerminterHold, setSqFtFerminterHold] = useState(0);
   const [holdingBtuHour, setHoldingBtuHour] = useState(0);
   const [totalCool, setTotalCool] = useState(0);
-  
+  const [recommendedChiller, setRecommendedChiller] = useState('N/A');
+
 
   const [cellarTotal,   setCellarTotal] = useState(0);
   const [walkInTotal,   setWalkInTotal] = useState(0);
@@ -196,7 +197,6 @@ function CalculatorForm() {
     }));
   };
 
-
 //Fermintation Load
 const fermLoad = () => {
   let fermentationTime = 72;
@@ -212,6 +212,10 @@ const knockdownLoad = () => {
   console.log()
 }
 
+useEffect(() => {
+  liquorLoad();
+ }, );
+
 //Cold Liquor Tank
 const liquorLoad = () => {
   let load = (cltSize * 31) * (9) * (.9)
@@ -221,6 +225,9 @@ const liquorLoad = () => {
    setCltBtuHour(Math.round((load * tempDif)/(cltTime)*1.15*1.3)); 
 }
 
+useEffect(() => {
+  pulldownLoad();
+ }, );
 //Pulldown Load
 const pulldownLoad = () => {
   let avgVass = bblTot/totVass;
@@ -241,23 +248,25 @@ const pulldownLoad = () => {
       120: 600,
       240: 1100
   };
-  
+
   // Find the appropriate key based on avgVass
   let key = Object.keys(avgValues)
   .sort((a, b) => b - a) // Sort keys in descending order
   .find(k => k <= avgVass);
-
 // If no key is found, use the smallest key
 if (!key) {
   key = Math.min(...Object.keys(avgValues));
 }
-
   setSqFtFerminterPull(avgValues[key]);
   let sqFtPull = ((sqFtFerminterPull * crashCoolingCount) * (0.15));
   let totBtu = ((ambientTemp - holdTemp) /2 );
   setPulldownBtuHour(totBtu * sqFtPull);
 }
 
+
+useEffect(() => {
+  holdingLoadFunc();
+ }, );
 //Holding Load
 const holdingLoadFunc = () => {
   let avgVass = Math.round(bblTot/totVass);
@@ -296,11 +305,19 @@ if (!key) {
 }
 
 
+useEffect(() => {
+  walkInCalc();
+ }, );
+
 //WalkIn Cooler
 const walkInCalc = () => { 
   setWalkInTotal(Math.round(((walkInLength*walkInWidth)+(walkInWidth*walkInHeight)+(walkInLength*walkInHeight))*2*14*(1.15*1.3)));
 };
 
+
+useEffect(() => {
+  wortCalc();
+ }, );
 
 //Wort Cooling
 const wortCalc = () => {
@@ -322,9 +339,39 @@ const cellarCalc = () => {
 
 };
 
+
+
+const chillerData = {
+  "N/A": 0,
+  "3/4 HP Chill & Flow": 5854,
+  "2 HP Chilstar": 15840,
+  "3 HP Chilstar": 23720,
+  "5 HP Chilstar": 34780,
+  "9 HP Chilstar": 68657
+};
+
+function updateRecommendedChiller() {
+  let recommendedChiller = totalCool > 68657 ? "Contact: Sales@prorefrigeration.com" : "N/A";
+
+  // If totalCool is not larger than 68657, find the recommended chiller
+  if (recommendedChiller === "N/A") {
+    for (const [chiller, coolValue] of Object.entries(chillerData)) {
+      if (totalCool <= coolValue) {
+        recommendedChiller = chiller;
+        break;
+      }
+    }
+  }
+
+  // Update state or perform any other actions with recommendedChiller value
+  setRecommendedChiller(recommendedChiller);
+}
+
+
 const totalCoolCalc = () => {
   cellarCalc();
   setTotalCool(cellarTotal+ cltBtuHour + walkInTotal + wortTotal);
+  updateRecommendedChiller();
 }
 
 
@@ -759,7 +806,7 @@ const totalCoolCalc = () => {
                     <input
                       type="text"
                       className=""
-                      value={knockoutTemp}
+                      value={recommendedChiller}
                       readOnly
                     />
                   </div>
@@ -958,7 +1005,7 @@ const totalCoolCalc = () => {
                         </div>  
                         <div className="flex-row">
                           <div>
-                            <b>Walk-In Length</b>
+                            <b>Walk-In Cooler Length</b>
                             <input
                               type="text"
                               placeholder="Length"
@@ -967,7 +1014,7 @@ const totalCoolCalc = () => {
                             />
                           </div>
                           <div>
-                            <b>Walk-In Width</b>
+                            <b>Walk-In Cooler Width</b>
                             <input
                               type="text"
                               placeholder="Width"
@@ -976,7 +1023,7 @@ const totalCoolCalc = () => {
                             />
                           </div>
                           <div>
-                            <b>Walk-In Height</b>
+                            <b>Walk-In Cooler Height</b>
                             <input
                               type="text"
                               placeholder="Height"
