@@ -98,14 +98,6 @@ function CalculatorForm() {
       const qtyValue = qtyValues[key];
       const sizeValue = sizeValues[key];
       const product = qtyValue * sizeValue;
-      walkInCalc();
-      wortCalc();
-      cellarCalc();
-      liquorLoad();
-      fermLoad();
-      knockdownLoad();
-      pulldownLoad();
-      holdingLoadFunc();
       totalCoolCalc();
       return {
         ...acc,
@@ -122,13 +114,19 @@ function CalculatorForm() {
     setBblTot(overallTotal);
   }, [qtyValues, sizeValues, setTotalBbl, setBblTot]);
 
-  useEffect(() => {
-    calculateTotal();
-  }, [qtyValues, sizeValues, calculateTotal]);
 
   useEffect(() => {
-   handleDescription(); handleSelectChange; totalCoolCalc(); cellarCalc(); walkInCalc(); wortCalc()
-  }, [qtyValues, sizeValues, calculateTotal, totalBbl, desc]);
+    calculateTotal(); 
+  }, [qtyValues, sizeValues, desc]);
+
+  useEffect(() => {
+   handleDescription(); 
+  }, [qtyValues, sizeValues, totalBbl, desc]);
+
+  useEffect(() => {
+    totalCoolCalc();
+   }, );
+  
 
   const handleQtyChange = (inputName, value) => {
     setQtyValues((prevInputValues) => {
@@ -313,12 +311,19 @@ const wortCalc = () => {
 
 //Cellar Cooling Req
 const cellarCalc = () => {
-  setCellarTotal(Math.round((activeBtuHour + knockdownBtuHour + pulldownBtuHour + holdingBtuHour) * 1.15 * 1.3));
-  console.log(activeBtuHour, knockdownBtuHour, pulldownBtuHour, holdingBtuHour);
-}
+  knockdownLoad();
+  pulldownLoad();
+  holdingLoadFunc();
+  fermLoad();
+  setCellarTotal(() => {
+    const newCellarTotal = Math.round((activeBtuHour + knockdownBtuHour + pulldownBtuHour + holdingBtuHour) * 1.15 * 1.3);
+    return newCellarTotal;
+  });
 
+};
 
 const totalCoolCalc = () => {
+  cellarCalc();
   setTotalCool(cellarTotal+ cltBtuHour + walkInTotal + wortTotal);
 }
 
@@ -330,7 +335,7 @@ const totalCoolCalc = () => {
           <form id="survey" className="">
               
             <div className="flex flex-row text-xs ">    
-              <div className="flex-row basis-1/3 p-2 ">
+              <div className="flex-row basis-1/3 p-2 indent border-solid border-2 rounded-2xl mr-1 ml-3">
                 <div className="text-lg">
                   <b className="">Active Fermentation</b>
                 </div>
@@ -348,7 +353,7 @@ const totalCoolCalc = () => {
                 </div>
               </div>
 
-              <div className="basis-1/3 p-2">
+              <div className="basis-1/3 p-2 indent border-solid border-2 rounded-2xl">
                 <div className="text-lg">
                   <b>Crash Cooling</b>
                 </div>
@@ -365,7 +370,7 @@ const totalCoolCalc = () => {
                     />
                   </div>
                   <div className="flex flex-row justify-center">
-                    <div className="my-1 pe-3">
+                    <div className="my-1 pe-3" >
                       <b>Temp To Cool To (°F):</b>
                     </div>
                     <input
@@ -378,7 +383,7 @@ const totalCoolCalc = () => {
                   </div>
               </div>
 
-              <div className="basis-1/3 p-2">
+              <div className="basis-1/3 p-2 indent border-solid border-2 rounded-2xl ml-1 mr-3">
                 <div className="text-lg">
                   <b>Holding Load</b>
                 </div>
@@ -412,13 +417,15 @@ const totalCoolCalc = () => {
             </div>  
 
 
-            <div className="flex justify-center">     
-              <fieldset className="basis-5/7">
+            <div className="flex justify-center mt-2">     
+              <fieldset className="basis-5/7 indent border-solid border-2 rounded-2xl p-2 ">
                 <div className="">
-                  <table id="surveytab" >
+                  <table id="surveytab">
+                    <tr>
                     <th>Description</th>
                     <th>Quantity</th>
                     <th>Tanks Size</th>
+                    </tr>
                     <tbody className="surveytr text-xs">
                       <td>
                         <select key={1} id="hear" onChange={(e) => handleSelectChange(1, e.target.value)}>
@@ -685,97 +692,97 @@ const totalCoolCalc = () => {
                   </table>
                 </div>
               </fieldset>
-              <div className="basis-2/7 text-xs p-2"> 
-                <div></div>
-                <div className="">
+              <div className="basis-2/7 text-xs "> 
+                <div className="indent border-solid border-2 rounded-2xl p-2 ml-1">
                   <div className="">
-                    <b>Cellar Cooling Requirement</b>
+                    <div className="">
+                      <b>Cellar Cooling Requirement</b>
+                    </div>
+                    <input
+                      type="text"
+                      className=""
+                      value={cellarTotal}
+                      readOnly
+                    />
                   </div>
-                  <input
-                    type="text"
-                    className=""
-                    value={cellarTotal}
-                    readOnly
-                  />
-                </div>
-                <div className="">
                   <div className="">
-                    <b>Cold Liquor Cooling Required</b>
+                    <div className="">
+                      <b>Cold Liquor Cooling Required</b>
+                    </div>
+                    <input
+                      type="text"
+                      className=""
+                      value={cltBtuHour}
+                      readOnly
+                      
+                    />
                   </div>
-                  <input
-                    type="text"
-                    className=""
-                    value={cltBtuHour}
-                    readOnly
-                    
-                  />
-                </div>
-                <div className="">
                   <div className="">
-                    <b>Walk-In Cooler Requirement</b>
+                    <div className="">
+                      <b>Walk-In Cooler Requirement</b>
+                    </div>
+                    <input
+                      type="text"
+                      className=""
+                      value={walkInTotal}
+                      readOnly
+                    />
                   </div>
-                  <input
-                    type="text"
-                    className=""
-                    value={walkInTotal}
-                    readOnly
-                  />
-                </div>
-                <div className="">
                   <div className="">
-                    <b>2 Stage Wort Cooler Requirement</b>
+                    <div className="">
+                      <b>2 Stage Wort Cooler Requirement</b>
+                    </div>
+                    <input
+                      type="text"
+                      className=""
+                      value={wortTotal}
+                      readOnly
+                    />
                   </div>
-                  <input
-                    type="text"
-                    className=""
-                    value={wortTotal}
-                    readOnly
-                  />
                 </div>
-                <div className="">
+                <div className="indent border-solid border-2 rounded-2xl p-2 ml-1 mt-1">
                   <div className="">
-                    <b>Total Cooling Requirement</b>
+                    <div className="">
+                      <b>Total Cooling Requirement</b>
+                    </div>
+                    <input
+                      type="text"
+                      className=""
+                      value={totalCool}
+                      readOnly
+                    />
                   </div>
-                  <input
-                    type="text"
-                    className=""
-                    value={totalCool}
-                    readOnly
-                  />
-                </div>
-                <div className="">
                   <div className="">
-                    <b>Recommended Chiller</b>
+                    <div className="">
+                      <b>Recommended Chiller</b>
+                    </div>
+                    <input
+                      type="text"
+                      className=""
+                      value={knockoutTemp}
+                      readOnly
+                    />
                   </div>
-                  <input
-                    type="text"
-                    className=""
-                    value={knockoutTemp}
-                    readOnly
-                  />
                 </div>
-                <div></div>
               </div>    
-            </div>            
-
-
-            <br />
-            <div className="flex flex-row text-xs">
-              <div className="basis-1/4 p-2 flex">
-                <div className=" pt-2">  
-                  <b>Total BBL Active:</b>
+            </div>  
+            <br/>          
+            <div className="flex flex-row text-xs mb-5">
+              <div className="basis-1/4 flex">
+                <div className="pr-2">  
+                  <b className="mr-1 text-balance">Total BBL{<br/>}Active</b>
                 </div>           
                 <input
                     type="text"
-                    className=" w-10 h-6"
+                    className="w-10 h-6"
                     id="activeFerm"
                     value={activeFerm}
                     readOnly
                 />
               </div>  
-              <div className="basis-1/4 p-2 flex">
-                <div className="pt-2">
-                  <b>Total BBL Crashing:</b>
+              <div className="basis-1/4 flex">
+                <div className="pr-2">
+                  <b>Total BBL{<br/>}Crashing</b>
                 </div>
                 <input
                   type="text"
@@ -785,9 +792,9 @@ const totalCoolCalc = () => {
                   readOnly
                 />
               </div>
-              <div className="basis-1/4 p-2 flex">  
-                <div className="pt-2">
-                  <b>Total BBL Holding:</b>
+              <div className="basis-1/4 flex">  
+                <div className="pr-2">
+                  <b>Total BBL{<br/>}Holding</b>
                 </div>
                 <input
                   type="text"
@@ -800,245 +807,197 @@ const totalCoolCalc = () => {
             </div>    
 
 
+            {/*  Bottom Questions & Logo Section  */}    
+            <div className="flex text-xs">
 
-          <div className="flex text-xs">
-
-              <div>
-                      <b>Are you using a Cold Liquor Tank?</b>
+              {/*  Questions Section  */}   
+              <div className="flex flex-wrap">
+                {/*  Cold Liquor Tank   */}          
+                <div>
+                  <div>
+                    <b className="pt-1.5 pr-2">Are you using a Cold Liquor Tank?</b>
                       <select
+                        className="h-7"
                         id="coldliqtank"
-                        onChange={(e) => setColdLiqTank(e.target.value)}
-                      >
+                        onChange={(e) => setColdLiqTank(e.target.value)}>
                         <option value="No">No</option>
                         <option value="Yes">Yes</option>
                       </select>
-
-                  <div>
-                      {coldLiqTank === 'Yes' && (
-                        <div id="coldliqtankq">
-                          <table className="">
-                              <div>
-                                <b>Temp to Cool To (°F)</b>
-                              </div>
-                                <input
-                                  type="text"
-                                  value={cltCoolTemp}
-                                  onChange={(e) => setCltCoolTemp(e.target.value)}
-                                />
-
-
-                            <div>
-                              <div>
-                                <b>BBL of Cold Liquor</b>
-                              </div>
-                                <input
-                                  type="text"
-                                  placeholder="Enter BBL"
-                                  value={cltSize}
-                                  onChange={(e) => setCltSize(e.target.value)}
-                                />
-                            </div>
-
-                            <div>
-                              <div>
-                                <b>Water Supply Temp (°F)</b>
-                              </div>
-                                <input
-                                  type="text"
-                                  value={cltWaterTemp}
-                                  onChange={(e) => setCltWaterTemp(e.target.value)}
-                                />
-                            </div>
-
-                            <div>
-                              <div>
-                                <b>Time to Cool (hrs)</b>
-                              </div>
-                                <input
-                                  type="text"
-                                  value={cltTime}
-                                  onChange={(e) => setCltTime(e.target.value)}
-                                />
-                            </div>
-
-
-                            <tr>
-                              <td>
-                                <br />
-                              </td>
-                              <td>
-                                <br />
-                              </td>
-                            </tr>
-                          </table>
+                  </div> 
+                  {coldLiqTank === 'Yes' && (
+                    <div className="flex flex-row indent border-solid border-2 rounded-2xl">
+                      <div className="flex-row">
+                        <div>
+                          <b>Temp To Cool To (°F)</b>
+                          <input
+                            type="text"
+                            value={cltCoolTemp}
+                            onChange={(e) => setCltCoolTemp(e.target.value)}
+                          />
                         </div>
-                      )}
-                  </div>
-                  <tr>
-                    <td>
-                      <b>Do you use glycol for your Wort Cooling?</b>
+                        <div>
+                          <b>BBL of Cold Liquor</b>
+                          <input
+                            type="text"
+                            placeholder="Enter BBL"
+                            value={cltSize}
+                            onChange={(e) => setCltSize(e.target.value)}
+                          />
+                        </div>
+                      </div> 
+                      <div className="flex-row">
+                        <div>
+                          <b>Water Supply Temp (°F)</b>
+                          <input
+                            type="text"
+                            value={cltWaterTemp}
+                            onChange={(e) => setCltWaterTemp(e.target.value)}
+                          />
+                        </div>
+                        <div>
+                          <b>Time To Cool (Hours)</b>
+                          <input
+                            type="text"
+                            value={cltTime}
+                            onChange={(e) => setCltTime(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+
+                {/*  Wort Cooling  */}      
+                <div className="">         
+                  <div className="">
+                      <b className="pt-1.5 pr-2">Do you use glycol for your Wort Cooling?</b>
                       <select
+                        className="h-7"
                         id="wortcool"
-                        onChange={(e) => setWortCool(e.target.value)}
-                      >
-                        <option value="No" >
-                          No
-                        </option>
-                        <option value="Yes">Yes</option>
-                      </select>
-                    </td>
-                  </tr>
-                  <tr>
-                      {wortCool === 'Yes' && (
-                        <div id="wortCoolQ">
-                          <table className="form-style-3">
-                            <tr>
-                              <td>
-                                <tr>
-                                  <td>
-                                    <b>Water Supply Temp (°F)</b>
-                                  </td>
-                                    <td>
-                                      <input
-                                        type="text"
-                                        value={wortWaterSupply}
-                                        onChange={(e) => setWortWaterSupply(e.target.value)}
-                                      />
-                                    </td>
-                                </tr>
-                                <tr>
-                                  <td>
-                                    <b>BBl of Wort</b>
-                                  </td>
-                                    <td>
-                                      <input
-                                        type="text"
-                                        placeholder="BBL"
-                                        value={wortBbl}
-                                        onChange={(e) => setWortBbl(e.target.value)}
-                                      />
-                                    </td>
-                                </tr>
-                                <tr>
-                                  <td>
-                                    <b>Transfer Time of Wort</b>
-                                  </td>
-                                    <td>
-                                      <select
-                                        onChange={(e) => setTransferTime(e.target.value)}>
-                                        <option value={30}>30 Min</option>
-                                        <option value={45}>45 Min</option>
-                                        <option value={60}>60 Min</option>
-                                      </select>
-                                    </td>
-                                </tr>
-                                <tr>
-                                  <td>
-                                    <b>Knockout Temp (°F)</b>
-                                  </td>
-                                  <td>
-                                    <input
-                                      type="text"
-                                      value={knockoutTemp}
-                                      onChange={(e) => setKnockoutTemp(e.target.value)}
-                                    />
-                                  </td>
-                                </tr> 
-                              </td>
-                            </tr>
-                          </table>
-                        </div>
-                      )}
-                  </tr>
-                  <tr>
-                      <b>Do you have a Walk-In Cooler?</b>
-                      <select
-                        id="walkincool"
-                        onChange={(e) => setWalkInCool(e.target.value)}
-                      >
+                        onChange={(e) => setWortCool(e.target.value)}>
                         <option value="No" >No</option>
                         <option value="Yes">Yes</option>
                       </select>
-                  </tr>
-                  <tr>
-                      {walkInCool === 'Yes' && (
-                        <div id="walkincoolq">
-                          <table className="form-style-3">
-                            <tr>
-                              <td>
-                                <tr>
-                                  <td>
-                                    <b>Room Temp (°F)</b>
-                                  </td>
-                                  <td>
-                                    <input
-                                      type="text"
-                                      value={walkInRoomTemp}
-                                      onChange={(e) => setWalkInRoomTemp(e.target.value)}
-                                    />
-                                  </td>
-                                </tr>
-                                <tr>
-                                  <td>
-                                    <b>Glycol Temp (°F)</b>
-                                  </td>
-                                  <td>
-                                    <input
-                                      type="text"
-                                      value={walkInGlycolTemp}
-                                      onChange={(e) => setWalkInGlycolTemp(e.target.value)}
-                                    />
-                                  </td>
-                                </tr>
-                                <tr>
-                                  <td>
-                                    <b>Length</b>
-                                  </td>
-                                  <td>
-                                    <input
-                                      type="text"
-                                      placeholder="Length"
-                                      value={walkInLength}
-                                      onChange={(e) => setWalkInLength(e.target.value)}
-                                    />
-                                  </td>
-                                </tr>
-                                <tr>
-                                  <td><b>Width</b></td>
-                                  <td>
-                                    <input
-                                      type="text"
-                                      placeholder="Width"
-                                      value={walkInWidth}
-                                      onChange={(e) => setWalkInWidth(e.target.value)}
-                                    />
-                                  </td>
-                                </tr>
-                                <tr>
-                                  <td><b>Height</b></td>
-                                  <td>
-                                    <input
-                                      type="text"
-                                      placeholder="Height"
-                                      value={walkInHeight}
-                                      onChange={(e) => setWalkInHeight(e.target.value)}
-                                    />
-                                  </td>
-                                </tr>
-                              </td>
-                            </tr>
-                          </table>
+                  </div>
+                  {wortCool === 'Yes' && (
+                    <div className="flex flex-row indent border-solid border-2 rounded-2xl">
+                      <div className="flex-row">  
+                        <div>
+                          <b>Water Supply Temp (°F)</b>
+                            <input
+                              type="text"
+                              value={wortWaterSupply}
+                              onChange={(e) => setWortWaterSupply(e.target.value)}
+                            />
                         </div>
-                      )}
-                  </tr>
+                        <div>
+                            <b>BBL of Wort Cooling</b>
+                              <input
+                                type="text"
+                                placeholder="BBL"
+                                value={wortBbl}
+                                onChange={(e) => setWortBbl(e.target.value)}
+                              />
+                        </div>
+                      </div> 
+                      <div className="flex-row">
+                        <div>
+                          <b>Transfer Time of Wort</b>
+                            <select
+                              className="w-40"
+                              onChange={(e) => setTransferTime(e.target.value)}>
+                              <option value={30}>30 Min</option>
+                              <option value={45}>45 Min</option>
+                              <option value={60}>60 Min</option>
+                            </select>
+                        </div>
+                        <div>
+                          <b>Knockout Temp (°F)</b>
+                          <input
+                            type="text"
+                            value={knockoutTemp}
+                            onChange={(e) => setKnockoutTemp(e.target.value)}
+                          />
+                        </div> 
+                      </div>
+                    </div>
+                  )}
+                </div>   
+                  {/*  Walk-In Cooler   */}      
+                <div >
+                  <div >
+                    <b className="pt-1.5 pr-2">Do you have a Walk-In Cooler?</b>
+                    <select
+                      className="h-7"
+                      id="walkincool"
+                      onChange={(e) => setWalkInCool(e.target.value)}>
+                      <option value="No" >No</option>
+                      <option value="Yes">Yes</option>
+                    </select>
+                  </div>
+                    {walkInCool === 'Yes' && (
+                      <div className="flex flex-row indent border-solid border-2 rounded-2xl">
+                        <div className="flex-row">
+                          <div>
+                            <b>Room Temperature (°F)</b>
+                            <input
+                              type="text"
+                              value={walkInRoomTemp}
+                              onChange={(e) => setWalkInRoomTemp(e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <b>Glycol Temperature (°F)</b>
+                            <input
+                              type="text"
+                              value={walkInGlycolTemp}
+                              onChange={(e) => setWalkInGlycolTemp(e.target.value)}
+                            />
+                          </div>
+                        </div>  
+                        <div className="flex-row">
+                          <div>
+                            <b>Walk-In Length</b>
+                            <input
+                              type="text"
+                              placeholder="Length"
+                              value={walkInLength}
+                              onChange={(e) => setWalkInLength(e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <b>Walk-In Width</b>
+                            <input
+                              type="text"
+                              placeholder="Width"
+                              value={walkInWidth}
+                              onChange={(e) => setWalkInWidth(e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <b>Walk-In Height</b>
+                            <input
+                              type="text"
+                              placeholder="Height"
+                              value={walkInHeight}
+                              onChange={(e) => setWalkInHeight(e.target.value)}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                </div>
               </div>
-            <div className="ml-20">
+
               <img
+                className="mr-2"
                   id="logo"
                   src="https://prochiller.com/wp-content/uploads/2018/05/Pro-Chiller-Logo-Dark-Blue.png"
                 />
             </div>
-            </div>
+
+
           </form>
         </div>
     </div>

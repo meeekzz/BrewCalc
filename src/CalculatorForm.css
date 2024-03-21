@@ -11,7 +11,7 @@
   max-width: 750px;
   /*max-width: 75%;*/
   padding: 10px 20px;
-  background: #d2d3d4;
+  background-color: rgb(203 213 225);
   margin: 10px auto;
   border-radius: 8px;
   font-family: Georgia, 'Times New Roman', Times, serif;
@@ -43,5 +43,11 @@
 .form-style-1 select:focus {
   /*background: #d2d9dd;*/
   border: 1px solid #4165a9;
+}
+
+
+.indent{
+  background-color: rgb(194, 204, 219); 
+  border-color: rgb(185, 196, 212);
 }
 
