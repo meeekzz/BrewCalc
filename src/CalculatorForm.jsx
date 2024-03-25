@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import './CalculatorForm.css';
+import ContactModal from './components/ContactModal';
 
 function CalculatorForm() {
 
@@ -85,12 +86,24 @@ function CalculatorForm() {
   const [holdingBtuHour, setHoldingBtuHour] = useState(0);
   const [totalCool, setTotalCool] = useState(0);
   const [recommendedChiller, setRecommendedChiller] = useState('N/A');
-
-
   const [cellarTotal,   setCellarTotal] = useState(0);
   const [walkInTotal,   setWalkInTotal] = useState(0);
   const [wortTotal,   setWortTotal] = useState(0);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+
+  // Function to handle modal open
+  const openModal = () => {
+    setIsModalOpen(true);
+    console.log(true)
+  };
+
+  // Function to handle modal close
+  const closeModal = () => {
+    setIsModalOpen(false);
+    console.log(false)
+  };
 
 
   // Calculate each row total by multiplying each Quantity of Vessels by its corresponding Size in BBL
@@ -252,7 +265,7 @@ const pulldownLoad = () => {
   // Find the appropriate key based on avgVass
   let key = Object.keys(avgValues)
   .sort((a, b) => b - a) // Sort keys in descending order
-  .find(k => k <= avgVass);
+  .find(k => k < avgVass);
 // If no key is found, use the smallest key
 if (!key) {
   key = Math.min(...Object.keys(avgValues));
@@ -266,7 +279,7 @@ if (!key) {
 
 useEffect(() => {
   holdingLoadFunc();
- }, );
+ }, []);
 //Holding Load
 const holdingLoadFunc = () => {
   let avgVass = Math.round(bblTot/totVass);
@@ -291,7 +304,7 @@ const holdingLoadFunc = () => {
   // Find the appropriate key based on avgVass
   let key = Object.keys(avgValues)
   .sort((a, b) => b - a) // Sort keys in descending order
-  .find(k => k <= avgVass);
+  .find(k => k < avgVass);
 
 // If no key is found, use the smallest key
 if (!key) {
@@ -302,6 +315,7 @@ if (!key) {
   let sqFtHold = ((sqFtFerminterHold * holdingLoadCount) * (0.15));
   let tempDifHold = ambientTemp - holdTemp;
   setHoldingBtuHour(sqFtHold * tempDifHold);
+  console.log(avgValues[key]);
 }
 
 
@@ -351,7 +365,7 @@ const chillerData = {
 };
 
 function updateRecommendedChiller() {
-  let recommendedChiller = totalCool > 68657 ? "Contact: Sales@prorefrigeration.com" : "N/A";
+  let recommendedChiller = totalCool > 68657 ? "Contact Local Sales Sales Rep" : "N/A";
 
   // If totalCool is not larger than 68657, find the recommended chiller
   if (recommendedChiller === "N/A") {
@@ -379,93 +393,15 @@ const totalCoolCalc = () => {
   return (
     <div>
         <div className="form-style-1">
+          <div className="overlay">
           <form id="survey" className="">
-              
-            <div className="flex flex-row text-xs ">    
-              <div className="flex-row basis-1/3 p-2 indent border-solid border-2 rounded-2xl mr-1 ml-3">
-                <div className="text-lg">
-                  <b className="">Active Fermentation</b>
-                </div>
-                <div className="flex flex-row mt-4 justify-center">
-                  <div className="mt-1">
-                    <b className="">Fermintation Temp (°F):</b>
-                  </div>
-                  <input
-                    type="text"
-                    className="fermTemp w-10 h-6"
-                    id="fermTemp"
-                    value={fermTemp}
-                    onChange={(e) => setFermTemp(e.target.value)}
-                  />
-                </div>
-              </div>
+            <h1>Brewload Calculator</h1>
 
-              <div className="basis-1/3 p-2 indent border-solid border-2 rounded-2xl">
-                <div className="text-lg">
-                  <b>Crash Cooling</b>
+            <div className="flex justify-center mt-5">     
+              <fieldset className="basis-5/7 border-solid border-2 rounded-2xl p-2">
+                <div className="">
+                  <h2 className="text-xl mb-5">Enter Tank Information</h2>
                 </div>
-                  <div className="flex flex-row justify-center">
-                    <div className="mt-1">
-                      <b>Cooling Duration (hrs):</b>
-                    </div>
-                    <input
-                      type="text"
-                      className="totHrsKnock w-10 h-6"
-                      id="totHrsKnock"
-                      value={totHrsKnock}
-                      onChange={(e) => setTotHrsKnock(e.target.value)}
-                    />
-                  </div>
-                  <div className="flex flex-row justify-center">
-                    <div className="my-1 pe-3" >
-                      <b>Temp To Cool To (°F):</b>
-                    </div>
-                    <input
-                      type="text"
-                      className="desireTemp w-10 h-6"
-                      id="desireTemp"
-                      value={desireTemp}
-                      onChange={(e) => setDesireTemp(e.target.value)}
-                    />
-                  </div>
-              </div>
-
-              <div className="basis-1/3 p-2 indent border-solid border-2 rounded-2xl ml-1 mr-3">
-                <div className="text-lg">
-                  <b>Holding Load</b>
-                </div>
-                <div className="flex flex-row justify-center">
-                  <div className="my-1 pe-1">
-                    <b>Holding Temp (°F)</b>
-                  </div>
-                  <input
-                    type="text"
-                    className="holdTemp w-10 h-6"
-                    id="holdTemp"
-                    value={holdTemp}
-                    onChange={(e) => setHoldTemp(e.target.value)}
-                  />
-                </div>
-
-                <div className="flex flex-row justify-center">
-                  <div className="my-1">
-                    <b>Ambient Temp (°F)</b>
-                  </div>
-                  <input
-                    type="text"
-                    className="ambientTemp w-10 h-6 "
-                    id="ambientTemp"
-                    value={ambientTemp}
-                    placeholder="90"
-                    onChange={(e) => setAmbientTemp(e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>  
-
-
-            <div className="flex justify-center mt-2">     
-              <fieldset className="basis-5/7 indent border-solid border-2 rounded-2xl p-2 ">
                 <div className="">
                   <table id="surveytab">
                     <tr>
@@ -473,9 +409,9 @@ const totalCoolCalc = () => {
                     <th>Quantity</th>
                     <th>Tanks Size</th>
                     </tr>
-                    <tbody className="surveytr text-xs">
+                    <tbody className="  text-xs">
                       <td>
-                        <select key={1} id="hear" onChange={(e) => handleSelectChange(1, e.target.value)}>
+                        <select  key={1} id="hear" onChange={(e) => handleSelectChange(1, e.target.value)}>
                           <option  value="activeFerm" >Active Fermentation</option>
                           <option  value="crashCooling">Crash Cooling</option>
                           <option  value="holdingLoad">Holding Load</option>
@@ -739,7 +675,7 @@ const totalCoolCalc = () => {
                   </table>
                 </div>
               </fieldset>
-              <div className="basis-2/7 text-xs "> 
+              <div className="basis-2/7 text-xs mt-10"> 
                 <div className="indent border-solid border-2 rounded-2xl p-2 ml-1">
                   <div className="">
                     <div className="">
@@ -777,7 +713,7 @@ const totalCoolCalc = () => {
                   </div>
                   <div className="">
                     <div className="">
-                      <b>2 Stage Wort Cooler Requirement</b>
+                      <b>Wort Cooler Requirement</b>
                     </div>
                     <input
                       type="text"
@@ -790,7 +726,7 @@ const totalCoolCalc = () => {
                 <div className="indent border-solid border-2 rounded-2xl p-2 ml-1 mt-1">
                   <div className="">
                     <div className="">
-                      <b>Total Cooling Requirement</b>
+                      <b>Total Cooling (BTU/H)</b>
                     </div>
                     <input
                       type="text"
@@ -851,7 +787,100 @@ const totalCoolCalc = () => {
                   readOnly
                 />
               </div>    
+              <div className="basis-1/4 flex">
+                {/* Button to open the modal */}
+                <button className="bg-white rounded-xl" type="button"onClick={openModal}>Sales Contact Information</button>
+    
+                {/* Render the ContactModal component */}
+                <ContactModal isOpen={isModalOpen} onClose={closeModal} />
+              </div>
             </div>    
+            
+
+            <h2 className="mb-2"><b>Fill out Information Below</b></h2>
+            <div className="flex flex-row text-xs wrapper">    
+              <div className="flex-row basis-1/3 p-2 border-solid border-2 rounded-2xl mr-1 ml-3">
+                <div className="text-lg">
+                  <b className="">Active Fermentation</b>
+                </div>
+                <div className="flex flex-row mt-4 justify-center">
+                  <div className="mt-1">
+                    <b className="">Fermintation Temp (°F):</b>
+                  </div>
+                  <input
+                    type="text"
+                    className="fermTemp w-10 h-6"
+                    id="fermTemp"
+                    value={fermTemp}
+                    onChange={(e) => setFermTemp(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="basis-1/3 p-2 border-solid border-2 rounded-2xl">
+                <div className="text-lg">
+                  <b>Crash Cooling</b>
+                </div>
+                  <div className="flex flex-row justify-center">
+                    <div className="mt-1">
+                      <b>Cooling Duration (hrs):</b>
+                    </div>
+                    <input
+                      type="text"
+                      className="totHrsKnock w-10 h-6"
+                      id="totHrsKnock"
+                      value={totHrsKnock}
+                      onChange={(e) => setTotHrsKnock(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex flex-row justify-center">
+                    <div className="my-1 pe-3" >
+                      <b>Temp To Cool To (°F):</b>
+                    </div>
+                    <input
+                      type="text"
+                      className="desireTemp w-10 h-6"
+                      id="desireTemp"
+                      value={desireTemp}
+                      onChange={(e) => setDesireTemp(e.target.value)}
+                    />
+                  </div>
+              </div>
+
+              <div className="basis-1/3 p-2 border-solid border-2 rounded-2xl ml-1 mr-3">
+                <div className="text-lg">
+                  <b>Holding Load</b>
+                </div>
+                <div className="flex flex-row justify-center">
+                  <div className="my-1 pe-1">
+                    <b>Holding Temp (°F)</b>
+                  </div>
+                  <input
+                    type="text"
+                    className="holdTemp w-10 h-6"
+                    id="holdTemp"
+                    value={holdTemp}
+                    onChange={(e) => setHoldTemp(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex flex-row justify-center">
+                  <div className="my-1">
+                    <b>Ambient Temp (°F)</b>
+                  </div>
+                  <input
+                    type="text"
+                    className="ambientTemp w-10 h-6 "
+                    id="ambientTemp"
+                    value={ambientTemp}
+                    placeholder="90"
+                    onChange={(e) => setAmbientTemp(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>  
+
+
 
 
             {/*  Bottom Questions & Logo Section  */}    
@@ -1043,9 +1072,8 @@ const totalCoolCalc = () => {
                   src="https://prochiller.com/wp-content/uploads/2018/05/Pro-Chiller-Logo-Dark-Blue.png"
                 />
             </div>
-
-
           </form>
+        </div>
         </div>
     </div>
   );
