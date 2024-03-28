@@ -14,8 +14,8 @@
   /*max-width: 75%;*/
   padding: 10px 20px;
   background:white;
-  margin: 10px auto;
-  border-radius: 8px;
+  margin: 0px auto;
+  border-radius: 0px;
   font-family: Georgia, 'Times New Roman', Times, serif;
 }
 
@@ -32,10 +32,9 @@
   border-radius: 4px;
   margin: 0;
   outline: 0;
-  padding: 7px;
+  padding: 6px;
   background-color: #ffffff;
   color: #8a97a0;
-  margin-bottom: 5px;
 }
 
 .form-style-1 input[type='text']:focus,
@@ -47,8 +46,21 @@
 
 
 .indent{
-  background-color:#0a1936b8;
+  background-color:#0a275f;
   border-color: rgb(185, 196, 212);
   color:white;
+}
+
+.totalCool{
+  width:80%;
+}
+
+.whiteBackground{
+  background-color:#ffffff89;
+  border-color: rgb(224, 230, 240);
+}
+
+.minusBottom{
+  margin-bottom: -30px;
 }
 

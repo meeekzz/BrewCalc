@@ -365,7 +365,7 @@ const chillerData = {
 };
 
 function updateRecommendedChiller() {
-  let recommendedChiller = totalCool > 68657 ? "Contact Local Sales Sales Rep" : "N/A";
+  let recommendedChiller = totalCool > 68657 || bblTot >= 8 ? "Contact Regional Sales Rep" : "N/A";
 
   // If totalCool is not larger than 68657, find the recommended chiller
   if (recommendedChiller === "N/A") {
@@ -396,18 +396,17 @@ const totalCoolCalc = () => {
           <div className="overlay">
           <form id="survey" className="">
             <h1>Brewload Calculator</h1>
-
-            <div className="flex justify-center mt-5">     
+            <div className="flex justify-center mt-5 minusBottom">     
               <fieldset className="basis-5/7 border-solid border-2 rounded-2xl p-2">
                 <div className="">
-                  <h2 className="text-xl mb-5">Enter Tank Information</h2>
+                  <h2 className="text-xl font-bold underline mb-2">Enter Tank Information</h2>
                 </div>
-                <div className="">
+                <div className="shadow-lg whiteBackground border-solid border-gray-150 border-2 p-1 rounded-2xl">
                   <table id="surveytab">
                     <tr>
                     <th>Description</th>
                     <th>Quantity</th>
-                    <th>Tanks Size</th>
+                    <th>Tank Size (BBL)</th>
                     </tr>
                     <tbody className="  text-xs">
                       <td>
@@ -675,137 +674,74 @@ const totalCoolCalc = () => {
                   </table>
                 </div>
               </fieldset>
-              <div className="basis-2/7 text-xs mt-10"> 
-                <div className="indent border-solid border-2 rounded-2xl p-2 ml-1">
+              <div className="basis-2/7 text-xs self-center mt-10"> 
+                <div className="indent rounded-2xl p-1 ml-1">
                   <div className="">
                     <div className="">
                       <b>Cellar Cooling Requirement</b>
                     </div>
                     <input
                       type="text"
-                      className=""
+                      className="w-20 text-center"
                       value={cellarTotal}
                       readOnly
                     />
                   </div>
-                  <div className="">
+                  <div className="mt-2">
                     <div className="">
-                      <b>Cold Liquor Cooling Required</b>
+                      <b>CLT Cooling Requirement</b>
                     </div>
                     <input
                       type="text"
-                      className=""
+                      className="w-20 text-center"
                       value={cltBtuHour}
                       readOnly
                       
                     />
                   </div>
-                  <div className="">
+                  <div className="mt-2">
+                    <div className="">
+                      <b>Wort Cooling Requirement</b>
+                    </div>
+                    <input
+                      type="text"
+                      className="w-20 text-center"
+                      value={wortTotal}
+                      readOnly
+                    />
+                  </div>
+                  <div className="mt-2">
                     <div className="">
                       <b>Walk-In Cooler Requirement</b>
                     </div>
                     <input
                       type="text"
-                      className=""
+                      className="w-20 text-center"
                       value={walkInTotal}
                       readOnly
                     />
                   </div>
-                  <div className="">
-                    <div className="">
-                      <b>Wort Cooler Requirement</b>
-                    </div>
-                    <input
-                      type="text"
-                      className=""
-                      value={wortTotal}
-                      readOnly
-                    />
-                  </div>
                 </div>
-                <div className="indent border-solid border-2 rounded-2xl p-2 ml-1 mt-1">
-                  <div className="">
-                    <div className="">
-                      <b>Total Cooling (BTU/H)</b>
+                <div className="whiteBackground shadow-lg pb-1 border-solid border-gray-150 border-2 rounded-2xl mt-1">
+                      <div className="text-sm mt-2">
+                        <b>Total Cooling (BTU/Hr)</b>
+                      </div>
+                      <input
+                        type="text"
+                        className="totalCool text-center "
+                        value={totalCool}
+                        readOnly
+                      />
                     </div>
-                    <input
-                      type="text"
-                      className=""
-                      value={totalCool}
-                      readOnly
-                    />
-                  </div>
-                  <div className="">
-                    <div className="">
-                      <b>Recommended Chiller</b>
-                    </div>
-                    <input
-                      type="text"
-                      className=""
-                      value={recommendedChiller}
-                      readOnly
-                    />
-                  </div>
-                </div>
               </div>    
             </div>  
             <br/>          
-            <div className="flex flex-row text-xs mb-5">
-              <div className="basis-1/4 flex">
-                <div className="pr-2">  
-                  <b className="mr-1 text-balance">Total BBL{<br/>}Active</b>
-                </div>           
-                <input
-                    type="text"
-                    className="w-10 h-6"
-                    id="activeFerm"
-                    value={activeFerm}
-                    readOnly
-                />
-              </div>  
-              <div className="basis-1/4 flex">
-                <div className="pr-2">
-                  <b>Total BBL{<br/>}Crashing</b>
-                </div>
-                <input
-                  type="text"
-                  className="w-10 h-6"
-                  id="crashCooling"
-                  value={crashCooling}
-                  readOnly
-                />
-              </div>
-              <div className="basis-1/4 flex">  
-                <div className="pr-2">
-                  <b>Total BBL{<br/>}Holding</b>
-                </div>
-                <input
-                  type="text"
-                  className="w-10 h-6"
-                  id="holdingLoad"
-                  value={holdingLoad}
-                  readOnly
-                />
-              </div>    
-              <div className="basis-1/4 flex">
-                {/* Button to open the modal */}
-                <button className="bg-white rounded-xl" type="button"onClick={openModal}>Sales Contact Information</button>
-    
-                {/* Render the ContactModal component */}
-                <ContactModal isOpen={isModalOpen} onClose={closeModal} />
-              </div>
-            </div>    
-            
-
-            <h2 className="mb-2"><b>Fill out Information Below</b></h2>
-            <div className="flex flex-row text-xs wrapper">    
-              <div className="flex-row basis-1/3 p-2 border-solid border-2 rounded-2xl mr-1 ml-3">
-                <div className="text-lg">
-                  <b className="">Active Fermentation</b>
-                </div>
-                <div className="flex flex-row mt-4 justify-center">
-                  <div className="mt-1">
-                    <b className="">Fermintation Temp (°F):</b>
+            <div className="mt-2 flex flex-row text-xs wrapper ">    
+              <div className="flex-row basis-1/3 mr-2 ml-3">
+                  <b className="text-base underline">Active Fermentation</b>
+                <div className="mt-1 justify-center">
+                  <div className="">
+                    <b className="">Fermentation Temp (°F)</b>
                   </div>
                   <input
                     type="text"
@@ -817,10 +753,8 @@ const totalCoolCalc = () => {
                 </div>
               </div>
 
-              <div className="basis-1/3 p-2 border-solid border-2 rounded-2xl">
-                <div className="text-lg">
-                  <b>Crash Cooling</b>
-                </div>
+              <div className="basis-1/3 pr-2 pl-2 ">
+                  <b className="text-base underline">Crash Cooling</b>
                   <div className="flex flex-row justify-center">
                     <div className="mt-1">
                       <b>Cooling Duration (hrs):</b>
@@ -846,10 +780,9 @@ const totalCoolCalc = () => {
                     />
                   </div>
               </div>
-
-              <div className="basis-1/3 p-2 border-solid border-2 rounded-2xl ml-1 mr-3">
-                <div className="text-lg">
-                  <b>Holding Load</b>
+              <div className="basis-1/3 ml-1 mr-3">
+                <div className="">
+                  <b className="text-base underline">Holding Load</b>
                 </div>
                 <div className="flex flex-row justify-center">
                   <div className="my-1 pe-1">
@@ -879,19 +812,47 @@ const totalCoolCalc = () => {
                 </div>
               </div>
             </div>  
+            <div className="flex flex-row text-xs mb-5 ml-10 mr-8 ">
+                <div className=" mt-2 basis-4/6 ">
+                    <div className="">
+                      <div className="text-base">
+                        <b>Recommended Chiller</b>
+                      </div>
+                      <input
+                        type="text"
+                        className="totalCool text-center"
+                        value={recommendedChiller}
+                        readOnly
+                      />
+                    </div>
+                  </div>
+
+ 
+              <div className="basis-2/6 justify-self-end self-center mt-5">
+                {/* Button to open the modal */}
+                <button className="bg-[#0a275f] text-white rounded-xl p-2" type="button"onClick={openModal}>Sales Contact Information</button>
+    
+                {/* Render the ContactModal component */}
+                <ContactModal isOpen={isModalOpen} onClose={closeModal} />
+              </div>
+              
+            </div>    
+            <hr className="mb-4"/>
+
+            
 
 
 
 
             {/*  Bottom Questions & Logo Section  */}    
-            <div className="flex text-xs">
+            <div className="flex text-xs mt-5">
 
               {/*  Questions Section  */}   
-              <div className="flex flex-wrap">
+              <div className="flex flex-wrap  ">
                 {/*  Cold Liquor Tank   */}          
-                <div>
+                <div className="">
                   <div>
-                    <b className="pt-1.5 pr-2">Are you using a Cold Liquor Tank?</b>
+                    <b className="text-lg pt-1.5 pr-2">Are you using a Cold Liquor Tank?</b>
                       <select
                         className="h-7"
                         id="coldliqtank"
@@ -901,7 +862,7 @@ const totalCoolCalc = () => {
                       </select>
                   </div> 
                   {coldLiqTank === 'Yes' && (
-                    <div className="flex flex-row indent border-solid border-2 rounded-2xl">
+                    <div className="whiteBackground flex flex-row ml-20 mr-20 pb-1 pt-1 rounded-2xl shadow-lg border-solid border-gray-150 border-2">
                       <div className="flex-row">
                         <div>
                           <b>Temp To Cool To (°F)</b>
@@ -945,9 +906,9 @@ const totalCoolCalc = () => {
 
 
                 {/*  Wort Cooling  */}      
-                <div className="">         
+                <div className="mt-2">         
                   <div className="">
-                      <b className="pt-1.5 pr-2">Do you use glycol for your Wort Cooling?</b>
+                      <b className="text-lg pr-2">Do you use glycol for your Wort Cooling?</b>
                       <select
                         className="h-7"
                         id="wortcool"
@@ -957,7 +918,7 @@ const totalCoolCalc = () => {
                       </select>
                   </div>
                   {wortCool === 'Yes' && (
-                    <div className="flex flex-row indent border-solid border-2 rounded-2xl">
+                    <div className="whiteBackground flex flex-row ml-20 mr-20 pb-1 pt-1 rounded-2xl shadow-lg border-solid border-gray-150 border-2">
                       <div className="flex-row">  
                         <div>
                           <b>Water Supply Temp (°F)</b>
@@ -1001,9 +962,9 @@ const totalCoolCalc = () => {
                   )}
                 </div>   
                   {/*  Walk-In Cooler   */}      
-                <div >
+                <div className="mt-2">
                   <div >
-                    <b className="pt-1.5 pr-2">Do you have a Walk-In Cooler?</b>
+                    <b className="text-lg pr-2">Do you have a Walk-In Cooler?</b>
                     <select
                       className="h-7"
                       id="walkincool"
@@ -1013,7 +974,7 @@ const totalCoolCalc = () => {
                     </select>
                   </div>
                     {walkInCool === 'Yes' && (
-                      <div className="flex flex-row indent border-solid border-2 rounded-2xl">
+                      <div className="whiteBackground flex flex-row ml-20 mr-20 pb-1 pt-1 rounded-2xl shadow-lg border-solid border-gray-150 border-2">
                         <div className="flex-row">
                           <div>
                             <b>Room Temperature (°F)</b>
@@ -1037,7 +998,7 @@ const totalCoolCalc = () => {
                             <b>Walk-In Cooler Length</b>
                             <input
                               type="text"
-                              placeholder="Length"
+                              placeholder="Length (Feet)"
                               value={walkInLength}
                               onChange={(e) => setWalkInLength(e.target.value)}
                             />
@@ -1046,7 +1007,7 @@ const totalCoolCalc = () => {
                             <b>Walk-In Cooler Width</b>
                             <input
                               type="text"
-                              placeholder="Width"
+                              placeholder="Width (Feet)"
                               value={walkInWidth}
                               onChange={(e) => setWalkInWidth(e.target.value)}
                             />
@@ -1055,7 +1016,7 @@ const totalCoolCalc = () => {
                             <b>Walk-In Cooler Height</b>
                             <input
                               type="text"
-                              placeholder="Height"
+                              placeholder="Height (Feet)"
                               value={walkInHeight}
                               onChange={(e) => setWalkInHeight(e.target.value)}
                             />
