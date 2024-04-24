@@ -92,17 +92,23 @@ function CalculatorForm() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const sumQtyValues= () => {
+    let total = 0;
+    for (const key in qtyValues) {
+      total += qtyValues[key];
+    }
+    return total;
+  };
+
 
   // Function to handle modal open
   const openModal = () => {
     setIsModalOpen(true);
-    console.log(true)
   };
 
   // Function to handle modal close
   const closeModal = () => {
     setIsModalOpen(false);
-    console.log(false)
   };
 
 
@@ -222,7 +228,7 @@ const knockdownLoad = () => {
   let fermTempDif = fermTemp - desireTemp
   let knockTot = knockdownMultiply * fermTempDif
   setKnockdownBtuHour(knockTot / totHrsKnock);
-  console.log()
+
 }
 
 useEffect(() => {
@@ -315,7 +321,6 @@ if (!key) {
   let sqFtHold = ((sqFtFerminterHold * holdingLoadCount) * (0.15));
   let tempDifHold = ambientTemp - holdTemp;
   setHoldingBtuHour(sqFtHold * tempDifHold);
-  console.log(avgValues[key]);
 }
 
 
@@ -357,15 +362,18 @@ const cellarCalc = () => {
 
 const chillerData = {
   "N/A": 0,
-  "3/4 HP Chill & Flow": 5854,
-  "2 HP Chilstar": 15840,
-  "3 HP Chilstar": 23720,
-  "5 HP Chilstar": 34780,
-  "9 HP Chilstar": 68657
+  "3/4 HP Chill & Flow": 5090,
+  "2 HP Chilstar": 14600,
+  "3 HP Chilstar": 22500,
+  "5 HP Chilstar": 30700,
+  "9 HP Chilstar": 59220
 };
 
 function updateRecommendedChiller() {
-  let recommendedChiller = totalCool > 68657 || bblTot >= 8 ? "Contact Regional Sales Rep" : "N/A";
+  let qtyValuesTotal = sumQtyValues();
+  let recommendedChiller = totalCool > 59220 || qtyValuesTotal >= 8? "Contact Regional Sales Rep" : "N/A";
+  console.log(totalCool, qtyValuesTotal);
+  
 
   // If totalCool is not larger than 68657, find the recommended chiller
   if (recommendedChiller === "N/A") {
