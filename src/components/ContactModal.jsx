@@ -15,7 +15,8 @@ function ContactModal({ isOpen, onClose }) {
   const eastContactInfo = {
     name: 'Wesley Thompson',
     email: 'wesleyt@prorefrigeration.com',
-    phone: '(336) 225-5742'
+    phone: '(336) 225-5742',
+    mail: 'fake@icloud.com'
   };
 
   return (
