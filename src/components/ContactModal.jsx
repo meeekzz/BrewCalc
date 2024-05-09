@@ -15,7 +15,7 @@ function ContactModal({ isOpen, onClose }) {
   const eastContactInfo = {
     name: 'Wesley Thompson',
     email: 'wesleyt@prorefrigeration.com',
-    phone: '(336) 225-5742)'
+    phone: '(336) 225-5742'
   };
 
   return (
@@ -31,19 +31,19 @@ function ContactModal({ isOpen, onClose }) {
         <div className="modal-body background1 mx-auto text-base p-4 rounded-lg">
           <p>{northWestContactInfo.name}</p>
           <p><a className="text-white hover:text-black " href={`mailto:${northWestContactInfo.email}`}>{northWestContactInfo.email}</a></p>
-          <p>{northWestContactInfo.phone}</p>
+          <p><a className="text-white hover:text-black " href={`tel:+${northWestContactInfo.phone}`}>{northWestContactInfo.phone}</a></p>
           <p>{northWestContactInfo.address}</p>
         </div>
         <div className="modal-body background2 mx-auto text-base p-4 rounded-lg">
           <p>{southWestContactInfo.name}</p>
           <p><a className="text-white hover:text-black" href={`mailto:${southWestContactInfo.email}`}>{southWestContactInfo.email}</a></p>
-          <p>{southWestContactInfo.phone}</p>
+          <p><a className="text-white hover:text-black " href={`tel:+${southWestContactInfo.phone}`}>{southWestContactInfo.phone}</a></p>
           <p>{southWestContactInfo.address}</p>
         </div>
         <div className="modal-body background3 mx-auto text-base p-4 rounded-lg">
           <p>{eastContactInfo.name}</p>
           <p><a className="text-white hover:text-black" href={`mailto:${eastContactInfo.email}`}>{eastContactInfo.email}</a></p>
-          <p>{eastContactInfo.phone}</p>
+          <p><a className="text-white hover:text-black " href={`tel:+${eastContactInfo.phone}`}>{eastContactInfo.phone}</a></p>
           <p>{eastContactInfo.address}</p>
         </div>
       </div>

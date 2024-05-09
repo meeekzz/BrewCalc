@@ -85,12 +85,19 @@ function CalculatorForm() {
   const [sqFtFerminterHold, setSqFtFerminterHold] = useState(0);
   const [holdingBtuHour, setHoldingBtuHour] = useState(0);
   const [totalCool, setTotalCool] = useState(0);
-  const [recommendedChiller, setRecommendedChiller] = useState('N/A');
+  const [recommendedChiller, setRecommendedChiller] = useState('');
   const [cellarTotal,   setCellarTotal] = useState(0);
   const [walkInTotal,   setWalkInTotal] = useState(0);
   const [wortTotal,   setWortTotal] = useState(0);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [linkUrl,   setLinkUrl] = useState('');
+  const [name, setName] = useState('');
+  const [busName, setBusName] = useState('')
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+
+
+
 
   const sumQtyValues= () => {
     let total = 0;
@@ -358,10 +365,17 @@ const cellarCalc = () => {
 
 };
 
+const linkUrls = {
+  "3/4 HP Chill & Flow": "https://prochiller.com/webstore/",
+  "2 HP Chilstar": "https://prochiller.com/product/chilstar-series-2hp/",
+  "3 HP Chilstar": "https://prochiller.com/product/chilstar-series-3hp/",
+  "5 HP Chilstar": "https://prochiller.com/product/chilstar-series-5hp/",
+  "9 HP Chilstar": "https://prochiller.com/product/chilstar-series-9hp/",
+  "Contact Regional Sales Rep": "https://prochiller.com/sales/"
 
-
+};
 const chillerData = {
-  "N/A": 0,
+  "": 0,
   "3/4 HP Chill & Flow": 5090,
   "2 HP Chilstar": 14600,
   "3 HP Chilstar": 22500,
@@ -371,12 +385,12 @@ const chillerData = {
 
 function updateRecommendedChiller() {
   let qtyValuesTotal = sumQtyValues();
-  let recommendedChiller = totalCool > 59220 || qtyValuesTotal >= 8? "Contact Regional Sales Rep" : "N/A";
-  console.log(totalCool, qtyValuesTotal);
+  let recommendedChiller = totalCool > 59220 || qtyValuesTotal >= 8? "Contact Regional Sales Rep" : "";
+
   
 
-  // If totalCool is not larger than 68657, find the recommended chiller
-  if (recommendedChiller === "N/A") {
+  // If totalCool is not larger than 59220, find the recommended chiller
+  if (recommendedChiller === "") {
     for (const [chiller, coolValue] of Object.entries(chillerData)) {
       if (totalCool <= coolValue) {
         recommendedChiller = chiller;
@@ -387,6 +401,9 @@ function updateRecommendedChiller() {
 
   // Update state or perform any other actions with recommendedChiller value
   setRecommendedChiller(recommendedChiller);
+
+  //Set URL based on recommendedChiller
+  setLinkUrl(linkUrls[recommendedChiller]);
 }
 
 
@@ -404,6 +421,38 @@ const totalCoolCalc = () => {
           <div className="overlay">
           <form id="survey" className="">
             <h1>Brewload Calculator</h1>
+            <form className='grid gap-1 py-4 rounded-2xl'> 
+              <input
+                type="text"
+                className="w-64 h-8 border-2 place-self-center text-xs" 
+                value={name}
+                placeholder="Name"
+                onChange={(e) => setName(e.target.value) }
+              />        
+              <input
+                type="text"
+                className="w-64 h-8 border-2 place-self-center text-xs"
+                value={busName}
+                placeholder="Company Name" 
+                onChange={(e) => setBusName(e.target.value) }
+              />        
+              <input
+                type="email"
+                className="w-64 h-8 border-2 place-self-center text-xs"
+                value={email}
+                placeholder="  Email"
+                onChange={(e) => setEmail(e.target.value) }
+              />        
+              <input
+                type="tel"
+                className="w-64 h-8 border-2 place-self-center text-xs"
+                value={phone}
+                placeholder="  Phone Number"
+                onChange={(e) => setPhone(e.target.value) }
+              /> 
+
+            <button  className='basis-1 submit-button w-24 rounded-full place-self-center'>Submit</button>
+            </form>
             <div className="flex justify-center mt-5 minusBottom">     
               <fieldset className="basis-5/7 border-solid border-2 rounded-2xl p-2">
                 <div className="">
@@ -826,12 +875,16 @@ const totalCoolCalc = () => {
                       <div className="text-base">
                         <b>Recommended Chiller</b>
                       </div>
-                      <input
-                        type="text"
-                        className="totalCool text-center"
-                        value={recommendedChiller}
-                        readOnly
-                      />
+                      <div>    
+                        <a
+                          href={linkUrl} 
+                          target="_blank"
+                          className=" text-center underline text-base"
+                          rel="noopener noreferrer"
+                        >
+                          {recommendedChiller} 
+                        </a>
+                      </div>
                     </div>
                   </div>
 
