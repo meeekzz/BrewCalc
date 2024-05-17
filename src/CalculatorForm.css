@@ -11,6 +11,7 @@
 
 .form-style-1 {
   max-width: 750px;
+  width:100%;
   /*max-width: 75%;*/
   padding: 10px 20px;
   background:white;

@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import './CalculatorForm.css';
 import ContactModal from './components/ContactModal';
+import axios from 'axios';
+
 
 function CalculatorForm() {
 
@@ -93,10 +95,30 @@ function CalculatorForm() {
   const [linkUrl,   setLinkUrl] = useState('');
   const [name, setName] = useState('');
   const [busName, setBusName] = useState('')
+  const [location, setLocation] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
 
 
+  const sendMail = () => {
+    event.preventDefault();
+    axios
+    .get("https://brewcalc.prochiller.com/",{
+      params: {
+        name,
+        busName,
+        location,
+        email,
+        phone,
+      }
+    })
+    .then(() => {
+      console.log("success");
+    })
+    .catch(() => {
+      console.log("fail")
+    })
+  }
 
 
   const sumQtyValues= () => {
@@ -435,23 +457,30 @@ const totalCoolCalc = () => {
                 value={busName}
                 placeholder="Company Name" 
                 onChange={(e) => setBusName(e.target.value) }
-              />        
+              />     
               <input
-                type="email"
+                type="text"
+                className="w-64 h-8 border-2 place-self-center text-xs"
+                value={location}
+                placeholder="City, State" 
+                onChange={(e) => setLocation(e.target.value) }
+              />     
+              <input
+                type="text"
                 className="w-64 h-8 border-2 place-self-center text-xs"
                 value={email}
                 placeholder="  Email"
                 onChange={(e) => setEmail(e.target.value) }
               />        
               <input
-                type="tel"
+                type="text"
                 className="w-64 h-8 border-2 place-self-center text-xs"
                 value={phone}
                 placeholder="  Phone Number"
                 onChange={(e) => setPhone(e.target.value) }
               /> 
 
-            <button  className='basis-1 submit-button w-24 rounded-full place-self-center'>Submit</button>
+            <button onClick={sendMail} className='basis-1 submit-button w-24 rounded-full place-self-center'>Submit</button>
             </form>
             <div className="flex justify-center mt-5 minusBottom">     
               <fieldset className="basis-5/7 border-solid border-2 rounded-2xl p-2">
@@ -735,7 +764,7 @@ const totalCoolCalc = () => {
                 <div className="indent rounded-2xl p-1 ml-1">
                   <div className="">
                     <div className="">
-                      <b>Cellar Cooling Requirement</b>
+                      <b>Cellar Cooling</b>
                     </div>
                     <input
                       type="text"
@@ -746,7 +775,7 @@ const totalCoolCalc = () => {
                   </div>
                   <div className="mt-2">
                     <div className="">
-                      <b>CLT Cooling Requirement</b>
+                      <b>CLT Cooling</b>
                     </div>
                     <input
                       type="text"
@@ -758,7 +787,7 @@ const totalCoolCalc = () => {
                   </div>
                   <div className="mt-2">
                     <div className="">
-                      <b>Wort Cooling Requirement</b>
+                      <b>Wort Cooling</b>
                     </div>
                     <input
                       type="text"
@@ -769,7 +798,7 @@ const totalCoolCalc = () => {
                   </div>
                   <div className="mt-2">
                     <div className="">
-                      <b>Walk-In Cooler Requirement</b>
+                      <b>Walk-In Cooling</b>
                     </div>
                     <input
                       type="text"
