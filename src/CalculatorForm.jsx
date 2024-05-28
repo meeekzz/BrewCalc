@@ -100,23 +100,20 @@ function CalculatorForm() {
   const [phone, setPhone] = useState('');
 
 
+
+
   const sendMail = () => {
     event.preventDefault();
     axios
-    .get("https://brewcalc.prochiller.com/",{
-      params: {
-        name,
-        busName,
-        location,
-        email,
-        phone,
+    .get("https://brewcalc.prochiller.com:4000",{
+    })
+    .then((response) => {
+      if(response.status === 200){
+        console.log("success");
       }
     })
-    .then(() => {
-      console.log("success");
-    })
-    .catch(() => {
-      console.log("fail")
+    .catch((error) => {
+      console.log("fail", error)
     })
   }
 
