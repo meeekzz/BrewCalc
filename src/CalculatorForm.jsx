@@ -106,6 +106,13 @@ function CalculatorForm() {
     event.preventDefault();
     axios
     .get("https://brewcalc.prochiller.com:4000",{
+      params: {
+        name,
+        busName,
+        location,
+        email,
+        phone
+      }
     })
     .then((response) => {
       if(response.status === 200){
