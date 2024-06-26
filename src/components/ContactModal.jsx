@@ -1,4 +1,4 @@
-import './ContactModal.css';
+import '../styles/ContactModal.css';
 
 function ContactModal({ isOpen, onClose }) {
   // Dummy contact information
