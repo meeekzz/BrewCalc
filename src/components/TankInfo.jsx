@@ -567,10 +567,11 @@ const TankInfo = ({ onNext, onPrev, setTotalTanks, setCellarTotal}) => {
                 </div>
 
                 <br/> 
-                <div className="">    
-                    <div className="flex flex-nowrap justify-center my-2">
+                <div className=""> 
+                <div></div>   
+                    <div className="flex flex-nowrap justify-left my-2">
                         <div className="mr-5">
-                            <b className="">Fermentation Temp (°F)</b>
+                            <b className="">Fermentation Temperature (°F)</b>
                         </div>
                         <input
                             type="text"
@@ -582,7 +583,7 @@ const TankInfo = ({ onNext, onPrev, setTotalTanks, setCellarTotal}) => {
                 </div>
                     <div className="flex flex-nowrap justify-center my-2">
                         <div className="mr-5">
-                            <b>Cooling Duration (hrs):</b>
+                            <b>Cooling Duration (Hours):</b>
                         </div>
                         <input
                             type="text"
@@ -594,7 +595,7 @@ const TankInfo = ({ onNext, onPrev, setTotalTanks, setCellarTotal}) => {
                     </div>
                     <div className="flex flex-nowrap justify-center my-2">
                         <div className="mr-5" >
-                            <b>Temp To Cool To (°F):</b>
+                            <b>Temperature To Cool To (°F):</b>
                         </div>
                         <input
                             type="text"
@@ -606,7 +607,7 @@ const TankInfo = ({ onNext, onPrev, setTotalTanks, setCellarTotal}) => {
                     </div>
                     <div className="flex flex-nowrap justify-center my-2">
                         <div className="mr-5">
-                            <b>Holding Temp (°F)</b>
+                            <b>Holding Temperature (°F)</b>
                         </div>
                         <input
                             type="text"
@@ -618,7 +619,7 @@ const TankInfo = ({ onNext, onPrev, setTotalTanks, setCellarTotal}) => {
                     </div> 
                     <div className="flex flex-nowrap justify-center my-2">
                         <div className="mr-5">
-                            <b>Ambient Temp (°F)</b>
+                            <b>Ambient Temperature (°F)</b>
                         </div>
                         <input
                             type="text"
@@ -627,7 +628,8 @@ const TankInfo = ({ onNext, onPrev, setTotalTanks, setCellarTotal}) => {
                             value={ambientTemp}
                             onChange={(e) => setAmbientTemp(e.target.value)}
                         />
-                    </div>   
+                    </div>
+                    <div></div>   
                 </div>
                 <button onClick={handlePrev} className='basis-1 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800'>Prev Step</button>
                 <button onClick={handleNext} className='basis-1 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800'>Next Step</button>

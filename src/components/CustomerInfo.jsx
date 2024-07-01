@@ -20,19 +20,27 @@ const CustomerInfo = ({ onNext, name, setName, busName, setBusName, location, se
         }
       };
 
+    const handleKeyDown = (event) => {
+        if(event.key === 'Enter') {
+            handleNext();
+        }
+    }
+
     const validateEmail = (email) => {
         const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return re.test(String(email).toLowerCase());
     };
 
     return (
-        <div className='grid gap-1 py-4 rounded-2xl'>
+        <div className='grid gap-1 pb- rounded-2xl'>
+            <h2 className="mb-5">Enter Contact Information</h2>
             <input
                 type="text"
                 className="font-medium w-64 h-8 border-2 place-self-center text-xs" 
                 value={name}
                 placeholder=" Name"
                 onChange={(e) => setName(e.target.value)}
+                onKeyDown={handleKeyDown}
                 aria-label="Name"
                 required
             />
@@ -42,6 +50,7 @@ const CustomerInfo = ({ onNext, name, setName, busName, setBusName, location, se
                 value={busName}
                 placeholder=" Company Name" 
                 onChange={(e) => setBusName(e.target.value)}
+                onKeyDown={handleKeyDown}
                 aria-label="Company Name"
                 required
             />
@@ -51,6 +60,7 @@ const CustomerInfo = ({ onNext, name, setName, busName, setBusName, location, se
                 value={location}
                 placeholder=" City, State" 
                 onChange={(e) => setLocation(e.target.value)}
+                onKeyDown={handleKeyDown}
                 aria-label="Location"
                 required
             />
@@ -60,6 +70,7 @@ const CustomerInfo = ({ onNext, name, setName, busName, setBusName, location, se
                 value={email}
                 placeholder=" Email"
                 onChange={(e) => setEmail(e.target.value)}
+                onKeyDown={handleKeyDown}
                 aria-label="Email"
                 required
             />  
@@ -69,6 +80,7 @@ const CustomerInfo = ({ onNext, name, setName, busName, setBusName, location, se
                 value={phone}
                 placeholder=" Phone Number"
                 onChange={(e) => setPhone(e.target.value)}
+                onKeyDown={handleKeyDown}
                 aria-label="Phone Number"
                 required
             />

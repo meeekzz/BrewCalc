@@ -6,7 +6,6 @@ const AdditionalInfo = ({ onNext, onPrev, name, busName, location, email, phone,
         onNext();
         //sendMail();
         console.log(totalCool)
-
     };
     const handlePrev = () => {
         onPrev();
@@ -55,8 +54,6 @@ const AdditionalInfo = ({ onNext, onPrev, name, busName, location, email, phone,
         //Load * Temp Dif / Pulldown Time
         setCltBtuHour(Math.round((load * tempDif)/(cltTime)*1.15*1.3)); 
         }
-    
-
 
     //Walk-In State
     const [walkInCool, setWalkInCool] = useState('No');
@@ -93,7 +90,6 @@ const AdditionalInfo = ({ onNext, onPrev, name, busName, location, email, phone,
         let wortNumber = ((wortBbl * 31) / transferTime) * (wortTempDif * 500);
         setWortTotal(Math.round(wortNumber * 1.15*1.3));
     }
-    
 
     const linkUrls = {
         "3/4 HP Chill & Flow": "https://prochiller.com/product/3-4hp-chill-flow-model-number-pe1008b1r805-a-v",
@@ -331,13 +327,10 @@ const AdditionalInfo = ({ onNext, onPrev, name, busName, location, email, phone,
                 </div>
               </div>
             </div>
-           <button onClick={handlePrev} className='basis-1 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800'>Prev Step</button>
-            <button onClick={handleNext} className='basis-1 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800'>Submit</button>
-            {/*Submit Button Tied into handleNext <button  onClick={sendEmail} className='basis-1 submit-button w-24 rounded-full place-self-center'>Submit</button> **/}
+          <button onClick={handlePrev} className='basis-1 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800'>Prev Step</button>
+          <button onClick={handleNext} className='basis-1 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800'>Calculate Cooling</button>
+          {/*Submit Button Tied into handleNext <button  onClick={sendEmail} className='basis-1 submit-button w-24 rounded-full place-self-center'>Submit</button> **/}
         </div>
-
-
-
     )
 }
 export default AdditionalInfo;
